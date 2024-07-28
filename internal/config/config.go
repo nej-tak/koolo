@@ -52,6 +52,10 @@ type KooloCfg struct {
 		ChatID  int64  `yaml:"chatId"`
 		Token   string `yaml:"token"`
 	}
+	Overseer struct {
+		Enabled bool   `yaml:"enabled"`
+		AppURL  string `yaml:"appUrl"`
+	} `yaml:"overseer"`
 }
 
 type CharacterCfg struct {
@@ -192,9 +196,9 @@ type CharacterCfg struct {
 		EquipmentBroken bool `yaml:"equipmentBroken"`
 	} `yaml:"backtotown"`
 	Runtime struct {
-		Rules nip.Rules   `yaml:"-"`
-		Drops []data.Item `yaml:"-"`
-	} `yaml:"-"`
+		Rules nip.Rules   `yaml:"-" json:"-"`
+		Drops []data.Item `yaml:"-" json:"-"`
+	} `yaml:"-" json:"-"`
 }
 
 type BeltColumns [4]string

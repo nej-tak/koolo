@@ -230,7 +230,20 @@ func containss(slice []string, item string) bool {
 	return false
 }
 
+func getAvailableTZs() map[int]string {
+	availableTZs := make(map[int]string)
+	for _, tz := range area.Areas {
+		if tz.CanBeTerrorized() {
+			availableTZs[int(tz.ID)] = tz.Name
+		}
+	}
+	return availableTZs
+}
+
 func (s *HttpServer) initialData(w http.ResponseWriter, r *http.Request) {
+	if config.Koolo.Overseer.Enabled {
+		enableCors(&w)
+	}
 	data := s.getStatusData()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)
@@ -266,12 +279,17 @@ func (s *HttpServer) Listen(port int) error {
 	http.HandleFunc("/supervisorSettings", s.characterSettings)
 	http.HandleFunc("/start", s.startSupervisor)
 	http.HandleFunc("/stop", s.stopSupervisor)
+	http.HandleFunc("/stop-all", s.stopAllSupervisors)
 	http.HandleFunc("/togglePause", s.togglePause)
 	http.HandleFunc("/debug", s.debugHandler)
 	http.HandleFunc("/debug-data", s.debugData)
 	http.HandleFunc("/drops", s.drops)
 	http.HandleFunc("/ws", s.wsServer.HandleWebSocket) // Web socket
 	http.HandleFunc("/initial-data", s.initialData)    // Web socket data
+
+	if config.Koolo.Overseer.Enabled {
+		ServeOverseerAPI(s)
+	}
 
 	assets, _ := fs.Sub(assetsFS, "assets")
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.FS(assets))))
@@ -368,6 +386,11 @@ func (s *HttpServer) startSupervisor(w http.ResponseWriter, r *http.Request) {
 	s.initialData(w, r)
 }
 
+func (s *HttpServer) stopAllSupervisors(w http.ResponseWriter, r *http.Request) {
+	s.manager.StopAllByName()
+	s.initialData(w, r)
+}
+
 func (s *HttpServer) stopSupervisor(w http.ResponseWriter, r *http.Request) {
 	s.manager.Stop(r.URL.Query().Get("characterName"))
 	s.initialData(w, r)
@@ -451,6 +474,9 @@ func (s *HttpServer) config(w http.ResponseWriter, r *http.Request) {
 		newConfig.Discord.EnableRunFinishMessages = r.Form.Has("enable_run_finish_messages")
 		newConfig.Discord.Token = r.Form.Get("discord_token")
 		newConfig.Discord.ChannelID = r.Form.Get("discord_channel_id")
+		// Overseer
+		newConfig.Overseer.Enabled = r.Form.Get("overseer_enabled") == "true"
+		newConfig.Overseer.AppURL = r.Form.Get("overseer_app_url")
 		// Telegram
 		newConfig.Telegram.Enabled = r.Form.Get("telegram_enabled") == "true"
 		newConfig.Telegram.Token = r.Form.Get("telegram_token")
@@ -670,12 +696,7 @@ func (s *HttpServer) characterSettings(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	availableTZs := make(map[int]string)
-	for _, tz := range area.Areas {
-		if tz.CanBeTerrorized() {
-			availableTZs[int(tz.ID)] = tz.Name
-		}
-	}
+	availableTZs := getAvailableTZs()
 
 	s.templates.ExecuteTemplate(w, "character_settings.gohtml", CharacterSettings{
 		Supervisor:   supervisor,

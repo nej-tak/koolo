@@ -20,3 +20,7 @@ telegram:
   enabled: false
   chatId: 0
   token: ''
+
+overseer:
+  enabled: false
+  appUrl: 'http://localhost:5173'
