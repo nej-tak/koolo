@@ -173,6 +173,12 @@ func (mng *SupervisorManager) StopAll() {
 	}
 }
 
+func (mng *SupervisorManager) StopAllByName() {
+	for name, _ := range mng.supervisors {
+		mng.Stop(name)
+	}
+}
+
 func (mng *SupervisorManager) Stop(supervisor string) {
 
 	s, found := mng.supervisors[supervisor]
