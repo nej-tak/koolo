@@ -183,3 +183,6 @@ backtotown:
     noHpPotions: true
     noMpPotions: false
     mercDied: true
+
+stash: 
+  stockpileRejuvs: false

@@ -191,6 +191,9 @@ type CharacterCfg struct {
 		MercDied        bool `yaml:"mercDied"`
 		EquipmentBroken bool `yaml:"equipmentBroken"`
 	} `yaml:"backtotown"`
+	Stash struct {
+		StockpileRejuvs bool `yaml:"stockpileRejuvs"`
+	} `yaml:"stash"`
 	Runtime struct {
 		Rules nip.Rules   `yaml:"-"`
 		Drops []data.Item `yaml:"-"`

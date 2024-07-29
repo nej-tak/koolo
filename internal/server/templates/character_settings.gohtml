@@ -361,6 +361,20 @@
                 Equipment Broken
                 </label>
             </fieldset>
+
+            <h4>Misc Stash Settings:</h4>
+                <label>
+                    <small>
+                        When stockpiling, add  <code># # [maxquantity] == 10</code> to your rejuv pickit rules to limit the amount stashed. Turning on Full Rejuv cubing is recommended.
+                    </small>
+                </label>
+            <fieldset id="stash_settings" class="grid">
+                <label>
+                    <input id="stockpile_rejuvs" type="checkbox" name="stockpileRejuvs" {{ if .Config.Stash.StockpileRejuvs }}checked{{ end }}/>
+                    Stockpile Rejuvs
+                </label> 
+            </fieldset>
+            
             <fieldset class="grid">
                 <a href="/"><input type="button" value="Cancel" class="secondary"/></a>
                 <input type="submit" value="Save"/>

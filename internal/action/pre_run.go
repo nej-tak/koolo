@@ -16,6 +16,10 @@ func (b *Builder) PreRun(firstRun bool) []Action {
 		actions = append(actions, b.Stash(firstRun))
 	}
 
+	if b.CharacterCfg.Stash.StockpileRejuvs {
+		actions = append(actions, b.EnsureNoIlligalRejuvs())
+	}
+
 	actions = append(actions,
 		b.UpdateQuestLog(),
 		b.IdentifyAll(firstRun),
