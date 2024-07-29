@@ -53,7 +53,7 @@ func (bm BeltManager) ShouldBuyPotions(d game.Data) bool {
 	targetManaAmount := bm.cfg.Inventory.BeltColumns.Total(data.ManaPotion) * d.Inventory.Belt.Rows()
 	targetRejuvAmount := bm.cfg.Inventory.BeltColumns.Total(data.RejuvenationPotion) * d.Inventory.Belt.Rows()
 
-	currentHealing, currentMana, currentRejuv := bm.getCurrentPotions(d)
+	currentHealing, currentMana, currentRejuv := bm.GetCurrentPotions(d)
 
 	bm.logger.Debug(fmt.Sprintf(
 		"Belt Stats Health: %d/%d healing, %d/%d mana, %d/%d rejuv.",
@@ -73,7 +73,7 @@ func (bm BeltManager) ShouldBuyPotions(d game.Data) bool {
 	return false
 }
 
-func (bm BeltManager) getCurrentPotions(d game.Data) (int, int, int) {
+func (bm BeltManager) GetCurrentPotions(d game.Data) (int, int, int) {
 	currentHealing := 0
 	currentMana := 0
 	currentRejuv := 0
@@ -95,7 +95,7 @@ func (bm BeltManager) getCurrentPotions(d game.Data) (int, int, int) {
 }
 
 func (bm BeltManager) GetMissingCount(d game.Data, potionType data.PotionType) int {
-	currentHealing, currentMana, currentRejuv := bm.getCurrentPotions(d)
+	currentHealing, currentMana, currentRejuv := bm.GetCurrentPotions(d)
 
 	switch potionType {
 	case data.HealingPotion:

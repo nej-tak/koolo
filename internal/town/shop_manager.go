@@ -186,6 +186,13 @@ func ItemsToBeSold(d game.Data) (items []data.Item) {
 			continue
 		}
 
+		if d.CharacterCfg.Stash.StockpileRejuvs && itm.IsRejuvPotion() {
+			/* @todo-nm check rjv maxquant nip rules and allow selling if above,
+			not really an issue since it won't pick rejuvs up in the first place.
+			But if for some reason a rejuv ends up in the inventory it will just take up space */
+			continue
+		}
+
 		if d.CharacterCfg.Inventory.InventoryLock[itm.Position.Y][itm.Position.X] == 1 {
 			// If item is a full match will be stashed, we don't want to sell it
 			if _, result := d.CharacterCfg.Runtime.Rules.EvaluateAll(itm); result == nip.RuleResultFullMatch && !itm.IsPotion() {

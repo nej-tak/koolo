@@ -118,6 +118,11 @@ func (b *Builder) getItemsToPickup(d game.Data, maxDistance int) []data.Item {
 			continue
 		}
 
+		if d.CharacterCfg.Stash.StockpileRejuvs && itm.IsRejuvPotion() {
+			itemsToPickup = append(itemsToPickup, itm)
+			continue
+		}
+
 		if !itm.IsPotion() {
 			itemsToPickup = append(itemsToPickup, itm)
 		}

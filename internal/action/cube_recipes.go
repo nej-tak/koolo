@@ -181,6 +181,12 @@ var (
 			Name:  "Upgrade Cham",
 			Items: []string{"ChamRune", "ChamRune", "FlawlessEmerald"},
 		},
+
+		// Misc
+		{
+			Name:  "Full Rejuv",
+			Items: []string{"RejuvenationPotion", "RejuvenationPotion", "RejuvenationPotion"},
+		},
 	}
 )
 
