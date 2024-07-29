@@ -57,7 +57,8 @@ func (b *Builder) Stash(forceStash bool) *Chain {
 
 func (b *Builder) orderInventoryPotions(d game.Data) {
 	for _, i := range d.Inventory.ByLocation(item.LocationInventory) {
-		if i.IsPotion() {
+		if (!d.CharacterCfg.Stash.StockpileRejuvs && i.IsPotion()) ||
+			(d.CharacterCfg.Stash.StockpileRejuvs && (i.IsManaPotion() || i.IsHealingPotion())) {
 			if d.CharacterCfg.Inventory.InventoryLock[i.Position.Y][i.Position.X] == 0 {
 				continue
 			}
@@ -175,7 +176,12 @@ func (b *Builder) shouldStashIt(d game.Data, i data.Item, firstRun bool) (bool, 
 		return false, "", ""
 	}
 
-	if i.Location.LocationType == item.LocationInventory && b.CharacterCfg.Inventory.InventoryLock[i.Position.Y][i.Position.X] == 0 || i.IsPotion() {
+	if i.Location.LocationType == item.LocationInventory && b.CharacterCfg.Inventory.InventoryLock[i.Position.Y][i.Position.X] == 0 {
+		return false, "", ""
+	}
+
+	if (!b.CharacterCfg.Stash.StockpileRejuvs && i.IsPotion()) ||
+		(b.CharacterCfg.Stash.StockpileRejuvs && (i.IsHealingPotion() || i.IsManaPotion())) {
 		return false, "", ""
 	}
 
@@ -206,6 +212,11 @@ func (b *Builder) stashItemAction(i data.Item, rule string, ruleFile string, fir
 		if it.UnitID == i.UnitID {
 			return false
 		}
+	}
+
+	// Never log rejuvs when we stockpile them
+	if b.CharacterCfg.Stash.StockpileRejuvs && i.IsRejuvPotion() {
+		return true
 	}
 
 	// Don't log items that we already have in inventory during first run

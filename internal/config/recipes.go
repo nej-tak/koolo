@@ -42,4 +42,5 @@ var AvailableRecipes = []string{
 	"Upgrade Ber",
 	"Upgrade Jah",
 	"Upgrade Cham",
+	"Full Rejuv",
 }
