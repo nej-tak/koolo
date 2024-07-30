@@ -8,8 +8,11 @@ import (
 	"github.com/hectorgimenez/koolo/internal/config"
 )
 
-type Configs struct {
-	KooloConfig       *config.KooloCfg                `json:"koolo"`
+type KooloConfigResponse struct {
+	KooloConfig *config.KooloCfg `json:"koolo"`
+}
+
+type SupervisorConfigsResponse struct {
 	SupervisorConfigs map[string]*config.CharacterCfg `json:"supervisors"`
 }
 
@@ -33,16 +36,30 @@ func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", config.Koolo.Overseer.AppURL)
 }
 
-func (s *HttpServer) GetConfigs(w http.ResponseWriter, r *http.Request) {
+func (s *HttpServer) GetKooloConfig(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
 
-	err := config.Load()
-	if err != nil {
+	if err := config.Load(); err != nil {
 		fmt.Printf("Failed to load configurations: %v\n", err)
 		return
 	}
-	data := Configs{
-		KooloConfig:       config.Koolo,
+
+	data := KooloConfigResponse{
+		KooloConfig: config.Koolo,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(data)
+}
+
+func (s *HttpServer) GetSupervisorConfigs(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+
+	if err := config.Load(); err != nil {
+		fmt.Printf("Failed to load configurations: %v\n", err)
+		return
+	}
+
+	data := SupervisorConfigsResponse{
 		SupervisorConfigs: getSanitizedConfigs(),
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -62,6 +79,7 @@ func (s *HttpServer) GetAvailableOptions(w http.ResponseWriter, r *http.Request)
 }
 
 func ServeOverseerAPI(s *HttpServer) {
-	http.HandleFunc("/overseer/configs", s.GetConfigs)
+	http.HandleFunc("/overseer/config/koolo", s.GetKooloConfig)
+	http.HandleFunc("/overseer/config/supervisors", s.GetSupervisorConfigs)
 	http.HandleFunc("/overseer/available", s.GetAvailableOptions)
 }

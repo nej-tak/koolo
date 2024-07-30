@@ -327,6 +327,9 @@ func (s *HttpServer) getRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *HttpServer) debugData(w http.ResponseWriter, r *http.Request) {
+	if config.Koolo.Overseer.Enabled {
+		enableCors(&w)
+	}
 	characterName := r.URL.Query().Get("characterName")
 	if characterName == "" {
 		http.Error(w, "Character name is required", http.StatusBadRequest)
