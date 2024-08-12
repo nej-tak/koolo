@@ -108,6 +108,7 @@ type CharacterCfg struct {
 			MoveThroughBlackMarsh bool `yaml:"moveThroughBlackMarsh"`
 			OpenChests            bool `yaml:"openChests"`
 			FocusOnElitePacks     bool `yaml:"focusOnElitePacks"`
+			OnlyClearLevel2       bool `yaml:"onlyClearLevel2"`
 		} `yaml:"pit"`
 		Andariel struct {
 			ClearRoom bool `yaml:"clearRoom"`
@@ -140,9 +141,9 @@ type CharacterCfg struct {
 			ClearArea bool `yaml:"clearArea"`
 		} `yaml:"nihlathak"`
 		Diablo struct {
-			KillDiablo bool `yaml:"killDiablo"`
-			ClearArea  bool `yaml:"clearArea"`
-			OnlyElites bool `yaml:"onlyElites"`
+			KillDiablo        bool `yaml:"killDiablo"`
+			FullClear         bool `yaml:"fullClear"`
+			FocusOnElitePacks bool `yaml:"focusOnElitePacks"`
 		} `yaml:"diablo"`
 		Baal struct {
 			KillBaal    bool `yaml:"killBaal"`

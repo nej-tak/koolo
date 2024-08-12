@@ -3,6 +3,7 @@
         <label><input type="checkbox" name="gamePitMoveThroughBlackMarsh" {{ if .Config.Game.Pit.MoveThroughBlackMarsh }}checked{{ end }}> Move through Black Marsh</label>
         <label><input type="checkbox" name="gamePitOpenChests" {{ if .Config.Game.Pit.OpenChests }}checked{{ end }}> Open chests</label>
         <label><input type="checkbox" name="gamePitFocusOnElitePacks" {{ if .Config.Game.Pit.FocusOnElitePacks }}checked{{ end }}> Focus on elite packs</label>
+        <label><input type="checkbox" name="gamePitOnlyClearLevel2" {{ if .Config.Game.Pit.OnlyClearLevel2 }}checked{{ end }}> Only clear level 2</label>
     </fieldset>
 {{ end }}
 
@@ -96,9 +97,11 @@
 
 {{ define "diablo" }}
     <fieldset>
-        <label><input type="checkbox" name="gameDiabloClearArea" {{ if .Config.Game.Diablo.ClearArea }}checked{{ end }}> Clear area</label>
-        <label><input type="checkbox" name="gameDiabloOnlyElites" {{ if .Config.Game.Diablo.OnlyElites }}checked{{ end }}> Focus on elite packs</label>
-        <label><input type="checkbox" name="gameDiabloKillDiablo" {{ if .Config.Game.Diablo.KillDiablo }}checked{{ end }}> Kill Diablo</label>
+        <label><input type="checkbox" name="gameDiabloKillDiablo" {{ if .Config.Game.Diablo.KillDiablo }}checked{{ end }}> Kill Diablo</label> 
+    </fieldset>
+    <fieldset class="grid">
+        <label><input type="checkbox" name="gameDiabloFullClear" {{ if .Config.Game.Diablo.FullClear }}checked{{ end }}> Full Clear</label>
+        <label><input type="checkbox" name="gameDiabloFocusOnElitePacks" {{ if .Config.Game.Diablo.FocusOnElitePacks }}checked{{ end }}> Elite Packs Only</label>
     </fieldset>
 {{ end }}
 
