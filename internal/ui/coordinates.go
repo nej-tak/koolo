@@ -63,22 +63,35 @@ const (
 	AnvilBtnX    = 272
 	AnvilBtnY    = 450
 
-	MainSkillButtonX = 596
-	MainSkillButtonY = 693
-
-	SecondarySkillButtonX = 686
-	SecondarySkillButtonY = 693
-
 	GambleRefreshButtonX        = 390
 	GambleRefreshButtonXClassic = 540
 
 	GambleRefreshButtonY        = 515
 	GambleRefreshButtonYClassic = 553
 
+	MainSkillButtonX = 596
+	MainSkillButtonY = 693
+
+	MainSkillButtonXClassic = 330
+	MainSkillButtonYClassic = 680
+
+	SecondarySkillButtonX = 686
+	SecondarySkillButtonY = 693
+
+	SecondarySkillButtonXClassic = 950
+	SecondarySkillButtonYClassic = 680
+
 	SecondarySkillListFirstSkillX = 687
 	MainSkillListFirstSkillX      = 592
-	SkillListFirstSkillY          = 590
-	SkillListSkillOffset          = 45
+
+	SecondarySkillListFirstSkillXClassic = 995
+	MainSkillListFirstSkillXClassic      = 340
+
+	SkillListFirstSkillY = 590
+	SkillListSkillOffset = 45
+
+	SkillListFirstSkillYClassic = 580
+	SkillListSkillOffsetClassic = 55
 
 	FirstMercFromContractorListX = 175
 	FirstMercFromContractorListY = 142
