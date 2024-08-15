@@ -216,8 +216,8 @@ func (s *HttpServer) BroadcastGameData() {
 
 		for _, supervisorName := range s.manager.AvailableSupervisors() {
 			if s.manager.Status(supervisorName).SupervisorStatus == koolo.InGame {
-				chr := config.Characters[supervisorName].CharacterName
-				gd[supervisorName] = s.manager.GetData(chr).Data
+				// the arg is not actually charactername but supervisorname
+				gd[supervisorName] = s.manager.GetData(supervisorName).Data
 			}
 		}
 
