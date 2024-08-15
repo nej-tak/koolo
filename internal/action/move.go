@@ -36,46 +36,21 @@ func (b *Builder) MoveToArea(dst area.ID) *Chain {
 		})
 	}
 
-	// Exception for Monastery Gate, we need to open the door and passthrough
 	openedDoors := make(map[object.Name]data.Position)
-	if dst == area.MonasteryGate {
-		return NewChain(func(d game.Data) []Action {
-			b.Logger.Debug("Monastery Gate detected, moving closer")
-			b.MoveToCoords(data.Position{X: 15139, Y: 5105})
-
-			// Move to specific coordinates before checking for the door
-			MoveToMonasteryAction := b.MoveToCoords(data.Position{X: 15139, Y: 5056})
-
-			return append([]Action{MoveToMonasteryAction}, NewChain(func(d game.Data) []Action {
-				b.Logger.Debug("Moving through Monastery Gate and opening the gate")
-				for _, o := range d.Objects {
-					if o.IsDoor() && pather.DistanceFromMe(d, o.Position) < 10 && openedDoors[o.Name] != o.Position {
-						if o.Selectable {
-							return []Action{
-								NewStepChain(func(d game.Data) []step.Step {
-									b.Logger.Info("Gate detected trying to open it...")
-									openedDoors[o.Name] = o.Position
-									return []step.Step{step.InteractObjectByID(o.ID, func(d game.Data) bool {
-										obj, found := d.Objects.FindByID(o.ID)
-										return found && !obj.Selectable
-									})}
-								}, CanBeSkipped()),
-							}
-						}
-					}
-				}
-				// If no door is found or interacted with, return an empty slice of Actions
-				return []Action{}
-			}))
-		})
-	}
-
+	monasteryGateLogged := false
 	toFun := func(d game.Data) (data.Position, bool) {
 		if d.PlayerUnit.Area == dst {
 			b.Logger.Debug("Reached area", slog.String("area", dst.Area().Name))
 			return data.Position{}, false
 		}
-
+		switch dst {
+		case area.MonasteryGate:
+			if !monasteryGateLogged {
+				b.Logger.Debug("Monastery Gate detected, moving to static coords")
+				monasteryGateLogged = true
+			}
+			return data.Position{X: 15139, Y: 5056}, true
+		}
 		for _, a := range d.AdjacentLevels {
 			if a.Area == dst {
 				// To correctly detect the two possible exits from Lut Gholein
@@ -86,23 +61,18 @@ func (b *Builder) MoveToArea(dst area.ID) *Chain {
 						return data.Position{X: 5096, Y: 4997}, true
 					}
 				}
-
 				// This means it's a cave, we don't want to load the map, just find the entrance and interact
 				if a.IsEntrance {
 					return a.Position, true
 				}
-
 				lvl, _ := b.Reader.GetCachedMapData(false).GetLevelData(a.Area)
 				_, _, objects, _ := b.Reader.GetCachedMapData(false).NPCsExitsAndObjects(lvl.Offset, a.Area)
-
 				// Sort objects by the distance from me
 				sort.Slice(objects, func(i, j int) bool {
 					distanceI := pather.DistanceFromMe(d, objects[i].Position)
 					distanceJ := pather.DistanceFromMe(d, objects[j].Position)
-
 					return distanceI < distanceJ
 				})
-
 				// Let's try to find any random object to use as a destination point, once we enter the level we will exit this flow
 				for _, obj := range objects {
 					_, _, found := b.PathFinder.GetPath(d, obj.Position)
@@ -110,31 +80,171 @@ func (b *Builder) MoveToArea(dst area.ID) *Chain {
 						return obj.Position, true
 					}
 				}
-
 				return a.Position, true
 			}
 		}
-
 		b.Logger.Debug("Destination area not found", slog.String("area", dst.Area().Name))
-
 		return data.Position{}, false
 	}
 
 	return NewChain(func(d game.Data) []Action {
-		return []Action{
-			b.MoveTo(toFun),
-			NewStepChain(func(d game.Data) []step.Step {
-				return []step.Step{
-					step.InteractEntrance(dst),
-					step.SyncStep(func(d game.Data) error {
-						event.Send(event.InteractedTo(event.Text(b.Supervisor, ""), int(dst), event.InteractionTypeEntrance))
-						return nil
-					}),
+		actions := []Action{b.MoveTo(toFun)}
+
+		// Add door opening logic for Monastery Gate
+		if dst == area.MonasteryGate {
+			actions = append(actions, NewChain(func(d game.Data) []Action {
+				for _, o := range d.Objects {
+					if o.IsDoor() && pather.DistanceFromMe(d, o.Position) < 10 && openedDoors[o.Name] != o.Position {
+						if o.Selectable {
+							return []Action{
+								NewStepChain(func(d game.Data) []step.Step {
+									b.Logger.Info("Door detected, attempting to open")
+									openedDoors[o.Name] = o.Position
+									return []step.Step{step.InteractObjectByID(o.ID, func(d game.Data) bool {
+										obj, found := d.Objects.FindByID(o.ID)
+										return found && !obj.Selectable
+									})}
+								}, CanBeSkipped()),
+							}
+						}
+					}
 				}
-			}),
+				return []Action{}
+			}))
 		}
+
+		actions = append(actions, NewStepChain(func(d game.Data) []step.Step {
+			return []step.Step{
+				step.InteractEntrance(dst),
+				step.SyncStep(func(d game.Data) error {
+					event.Send(event.InteractedTo(event.Text(b.Supervisor, ""), int(dst), event.InteractionTypeEntrance))
+					return nil
+				}),
+			}
+		}))
+
+		return actions
 	}, Resettable())
 }
+
+// func (b *Builder) MoveToArea(dst area.ID) *Chain {
+// 	// Exception for Arcane Sanctuary, we need to find the portal first
+// 	if dst == area.ArcaneSanctuary {
+// 		return NewChain(func(d game.Data) []Action {
+// 			b.Logger.Debug("Arcane Sanctuary detected, finding the Portal")
+// 			portal, _ := d.Objects.FindOne(object.ArcaneSanctuaryPortal)
+// 			return []Action{
+// 				b.MoveToCoords(portal.Position),
+// 				NewStepChain(func(d game.Data) []step.Step {
+// 					return []step.Step{
+// 						step.InteractObject(object.ArcaneSanctuaryPortal, func(d game.Data) bool {
+// 							return d.PlayerUnit.Area == area.ArcaneSanctuary
+// 						}),
+// 					}
+// 				}),
+// 			}
+// 		})
+// 	}
+
+// 	// Exception for Monastery Gate, we need to open the door and passthrough
+// 	openedDoors := make(map[object.Name]data.Position)
+// 	if dst == area.MonasteryGate {
+// 		return NewChain(func(d game.Data) []Action {
+// 			b.Logger.Debug("Monastery Gate detected, moving closer")
+// 			b.MoveToCoords(data.Position{X: 15139, Y: 5105})
+
+// 			// Move to specific coordinates before checking for the door
+// 			MoveToMonasteryAction := b.MoveToCoords(data.Position{X: 15139, Y: 5056})
+
+// 			return append([]Action{MoveToMonasteryAction}, NewChain(func(d game.Data) []Action {
+// 				b.Logger.Debug("Moving through Monastery Gate and opening the gate")
+// 				for _, o := range d.Objects {
+// 					if o.IsDoor() && pather.DistanceFromMe(d, o.Position) < 10 && openedDoors[o.Name] != o.Position {
+// 						if o.Selectable {
+// 							return []Action{
+// 								NewStepChain(func(d game.Data) []step.Step {
+// 									b.Logger.Info("Gate detected trying to open it...")
+// 									openedDoors[o.Name] = o.Position
+// 									return []step.Step{step.InteractObjectByID(o.ID, func(d game.Data) bool {
+// 										obj, found := d.Objects.FindByID(o.ID)
+// 										return found && !obj.Selectable
+// 									})}
+// 								}, CanBeSkipped()),
+// 							}
+// 						}
+// 					}
+// 				}
+// 				// If no door is found or interacted with, return an empty slice of Actions
+// 				return []Action{}
+// 			}))
+// 		})
+// 	}
+
+// 	toFun := func(d game.Data) (data.Position, bool) {
+// 		if d.PlayerUnit.Area == dst {
+// 			b.Logger.Debug("Reached area", slog.String("area", dst.Area().Name))
+// 			return data.Position{}, false
+// 		}
+
+// 		for _, a := range d.AdjacentLevels {
+// 			if a.Area == dst {
+// 				// To correctly detect the two possible exits from Lut Gholein
+// 				if dst == area.RockyWaste && d.PlayerUnit.Area == area.LutGholein {
+// 					if _, _, found := b.PathFinder.GetPath(d, data.Position{X: 5004, Y: 5065}); found {
+// 						return data.Position{X: 4989, Y: 5063}, true
+// 					} else {
+// 						return data.Position{X: 5096, Y: 4997}, true
+// 					}
+// 				}
+
+// 				// This means it's a cave, we don't want to load the map, just find the entrance and interact
+// 				if a.IsEntrance {
+// 					return a.Position, true
+// 				}
+
+// 				lvl, _ := b.Reader.GetCachedMapData(false).GetLevelData(a.Area)
+// 				_, _, objects, _ := b.Reader.GetCachedMapData(false).NPCsExitsAndObjects(lvl.Offset, a.Area)
+
+// 				// Sort objects by the distance from me
+// 				sort.Slice(objects, func(i, j int) bool {
+// 					distanceI := pather.DistanceFromMe(d, objects[i].Position)
+// 					distanceJ := pather.DistanceFromMe(d, objects[j].Position)
+
+// 					return distanceI < distanceJ
+// 				})
+
+// 				// Let's try to find any random object to use as a destination point, once we enter the level we will exit this flow
+// 				for _, obj := range objects {
+// 					_, _, found := b.PathFinder.GetPath(d, obj.Position)
+// 					if found {
+// 						return obj.Position, true
+// 					}
+// 				}
+
+// 				return a.Position, true
+// 			}
+// 		}
+
+// 		b.Logger.Debug("Destination area not found", slog.String("area", dst.Area().Name))
+
+// 		return data.Position{}, false
+// 	}
+
+// 	return NewChain(func(d game.Data) []Action {
+// 		return []Action{
+// 			b.MoveTo(toFun),
+// 			NewStepChain(func(d game.Data) []step.Step {
+// 				return []step.Step{
+// 					step.InteractEntrance(dst),
+// 					step.SyncStep(func(d game.Data) error {
+// 						event.Send(event.InteractedTo(event.Text(b.Supervisor, ""), int(dst), event.InteractionTypeEntrance))
+// 						return nil
+// 					}),
+// 				}
+// 			}),
+// 		}
+// 	}, Resettable())
+// }
 
 func (b *Builder) MoveToCoordsWithMinDistance(to data.Position, minDistance int, opts ...step.MoveToStepOption) *Chain {
 	return b.MoveTo(func(d game.Data) (data.Position, bool) {
