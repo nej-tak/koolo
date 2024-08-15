@@ -190,3 +190,7 @@ backtotown:
 
 stash: 
   stockpileRejuvs: false
+
+overseer:
+    tmp: false
+    apiSupervisorId: "" # id of the supervisor in overseer api (/api/me/supervisorname)

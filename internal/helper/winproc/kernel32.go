@@ -10,4 +10,5 @@ const (
 var (
 	KERNEL32                = windows.NewLazySystemDLL("kernel32.dll")
 	SetThreadExecutionState = KERNEL32.NewProc("SetThreadExecutionState")
+	GetLastError            = KERNEL32.NewProc("GetLastError")
 )

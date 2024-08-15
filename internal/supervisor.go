@@ -3,6 +3,7 @@ package koolo
 import (
 	"context"
 	"fmt"
+	"image"
 	"log/slog"
 	"os"
 	"strings"
@@ -23,6 +24,7 @@ type Supervisor interface {
 	TogglePause()
 	SetWindowPosition(x, y int)
 	GetData() game.Data
+	GetImg() (image.Image, error)
 }
 
 type baseSupervisor struct {
@@ -60,6 +62,10 @@ func (s *baseSupervisor) Stats() Stats {
 
 func (s *baseSupervisor) GetData() game.Data {
 	return s.c.Reader.GetData(false)
+}
+
+func (s *baseSupervisor) GetImg() (image.Image, error) {
+	return s.c.Reader.ScreenshotWithRelease()
 }
 
 func (s *baseSupervisor) TogglePause() {

@@ -14,6 +14,7 @@ import (
 	"github.com/hectorgimenez/koolo/internal/event"
 	"github.com/hectorgimenez/koolo/internal/helper"
 	"github.com/hectorgimenez/koolo/internal/helper/winproc"
+	"github.com/hectorgimenez/koolo/internal/overseer"
 	"github.com/hectorgimenez/koolo/internal/remote/discord"
 	"github.com/hectorgimenez/koolo/internal/remote/telegram"
 	"github.com/hectorgimenez/koolo/internal/server"
@@ -122,6 +123,10 @@ func main() {
 		defer cancel()
 		return eventListener.Listen(ctx)
 	})
+
+	if config.Koolo.Overseer.Enabled {
+		eventListener.Register(overseer.Handle)
+	}
 
 	g.Go(func() error {
 		<-ctx.Done()

@@ -16,6 +16,8 @@ import (
 	"github.com/lxn/win"
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
+
+	"github.com/shirou/gopsutil/process"
 )
 
 var (
@@ -367,4 +369,56 @@ func StartGame(username string, password string, authmethod string, authToken st
 	}
 
 	return uint32(cmd.Process.Pid), win.HWND(foundHwnd), nil
+}
+
+// will just call the existing startgame func if not using the exact character.
+// just for dev/testing quick changes with a single client
+func StartGameOrUseExisting(supervisorName string, username string, password string, authmethod string, authToken string, realm string, arguments string, useCustomSettings bool) (uint32, win.HWND, error) {
+	shouldUseExisting := supervisorName == "SorcLeveling"
+	if !shouldUseExisting {
+		return StartGame(username, password, authmethod, authToken, realm, arguments, useCustomSettings)
+	}
+
+	// Check if D2R.exe is already running
+	processes, err := process.Processes()
+	if err != nil {
+		return 0, 0, fmt.Errorf("error getting processes: %v", err)
+	}
+
+	var existingPID uint32
+	for _, p := range processes {
+		name, err := p.Name()
+		if err != nil {
+			continue
+		}
+		if name == "D2R.exe" {
+			existingPID = uint32(p.Pid)
+			break
+		}
+	}
+
+	if existingPID == 0 {
+		// If D2R.exe is not running, start a new instance
+		return StartGame(username, password, authmethod, authToken, realm, arguments, useCustomSettings)
+	}
+
+	// D2R.exe is already running, find its HWND
+	var foundHwnd windows.HWND
+	cb := syscall.NewCallback(func(hwnd windows.HWND, lParam uintptr) uintptr {
+		var pid uint32
+		windows.GetWindowThreadProcessId(hwnd, &pid)
+		if pid == existingPID {
+			foundHwnd = hwnd
+			return 0
+		}
+		return 1
+	})
+
+	windows.EnumWindows(cb, unsafe.Pointer(&existingPID))
+
+	if foundHwnd == 0 {
+		return 0, 0, fmt.Errorf("couldn't find HWND for existing D2R.exe process")
+	}
+
+	return existingPID, win.HWND(foundHwnd), nil
 }

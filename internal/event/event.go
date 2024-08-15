@@ -192,3 +192,43 @@ func GamePaused(be BaseEvent, paused bool) GamePausedEvent {
 		Paused:    paused,
 	}
 }
+
+type LogEvent struct {
+	BaseEvent
+	LogMessage string
+	LogLevel   int
+}
+
+func OnLog(be BaseEvent, message string, level int) LogEvent {
+	return LogEvent{
+		BaseEvent:  be,
+		LogMessage: message,
+		LogLevel:   level,
+	}
+}
+
+type AboutToStashItemEvent struct {
+	BaseEvent
+	Item data.Drop
+}
+
+func AboutToStashItem(be BaseEvent, drop data.Drop) AboutToStashItemEvent {
+	return AboutToStashItemEvent{
+		BaseEvent: be,
+		Item:      drop,
+	}
+}
+
+type IdentifiedItemEvent struct {
+	BaseEvent
+	Screenshot []byte
+	Item       data.Drop
+}
+
+func IdentifiedItem(be BaseEvent, screenshot []byte, drop data.Drop) IdentifiedItemEvent {
+	return IdentifiedItemEvent{
+		BaseEvent:  be,
+		Screenshot: screenshot,
+		Item:       drop,
+	}
+}

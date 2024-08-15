@@ -2,6 +2,7 @@ package koolo
 
 import (
 	"fmt"
+	"image"
 	"log/slog"
 	"runtime/debug"
 	"strconv"
@@ -63,7 +64,7 @@ func (mng *SupervisorManager) Start(supervisorName string) error {
 		return fmt.Errorf("error loading config: %w", err)
 	}
 
-	supervisorLogger, err := log.NewLogger(config.Koolo.Debug.Log, config.Koolo.LogSaveDirectory, supervisorName)
+	supervisorLogger, err := log.NewEventLogger(config.Koolo.Debug.Log, config.Koolo.LogSaveDirectory, supervisorName)
 	if err != nil {
 		return err
 	}
@@ -225,13 +226,23 @@ func (mng *SupervisorManager) GetData(characterName string) game.Data {
 	return game.Data{}
 }
 
+func (mng *SupervisorManager) GetImg(characterName string) (image.Image, error) {
+	for name, supervisor := range mng.supervisors {
+		if name == characterName {
+			return supervisor.GetImg()
+		}
+	}
+
+	return nil, nil
+}
+
 func (mng *SupervisorManager) buildSupervisor(supervisorName string, logger *slog.Logger, restartFunc func()) (Supervisor, *game.CrashDetector, error) {
 	cfg, found := config.Characters[supervisorName]
 	if !found {
 		return nil, nil, fmt.Errorf("character %s not found", supervisorName)
 	}
 
-	pid, hwnd, err := game.StartGame(cfg.Username, cfg.Password, cfg.AuthMethod, cfg.AuthToken, cfg.Realm, cfg.CommandLineArgs, config.Koolo.UseCustomSettings)
+	pid, hwnd, err := game.StartGameOrUseExisting(supervisorName, cfg.Username, cfg.Password, cfg.AuthMethod, cfg.AuthToken, cfg.Realm, cfg.CommandLineArgs, config.Koolo.UseCustomSettings)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error starting game: %w", err)
 	}

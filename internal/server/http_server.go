@@ -23,14 +23,17 @@ import (
 	koolo "github.com/hectorgimenez/koolo/internal"
 	"github.com/hectorgimenez/koolo/internal/config"
 	"github.com/hectorgimenez/koolo/internal/helper"
+	"github.com/hectorgimenez/koolo/internal/overseer"
 )
 
 type HttpServer struct {
-	logger    *slog.Logger
-	server    *http.Server
-	manager   *koolo.SupervisorManager
-	templates *template.Template
-	wsServer  *WebSocketServer
+	logger     *slog.Logger
+	server     *http.Server
+	manager    *koolo.SupervisorManager
+	templates  *template.Template
+	wsServer   *WebSocketServer
+	wsServerOs *WebSocketServer
+	wsGameData *WebSocketServer
 }
 
 var (
@@ -56,15 +59,29 @@ type WebSocketServer struct {
 	broadcast  chan []byte
 	register   chan *Client
 	unregister chan *Client
+
+	overseer chan []byte
+	gdStream chan []byte
 }
 
-func NewWebSocketServer() *WebSocketServer {
-	return &WebSocketServer{
+func (ws *WebSocketServer) GetOverseerChannel() chan []byte {
+	return ws.overseer
+}
+
+func NewWebSocketServer(withOverseer bool, withGameDataStream bool) *WebSocketServer {
+	ws := &WebSocketServer{
 		clients:    make(map[*Client]bool),
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 	}
+	if withOverseer {
+		ws.overseer = make(chan []byte)
+	}
+	if withGameDataStream {
+		ws.gdStream = make(chan []byte)
+	}
+	return ws
 }
 
 func (s *WebSocketServer) Run() {
@@ -84,6 +101,28 @@ func (s *WebSocketServer) Run() {
 				default:
 					close(client.send)
 					delete(s.clients, client)
+				}
+			}
+		case message := <-s.overseer:
+			if s.overseer != nil {
+				for client := range s.clients {
+					select {
+					case client.send <- message:
+					default:
+						close(client.send)
+						delete(s.clients, client)
+					}
+				}
+			}
+		case message := <-s.gdStream:
+			if s.gdStream != nil {
+				for client := range s.clients {
+					select {
+					case client.send <- message:
+					default:
+						close(client.send)
+						delete(s.clients, client)
+					}
 				}
 			}
 		}
@@ -132,17 +171,27 @@ func (s *WebSocketServer) writePump(client *Client) {
 
 func (s *WebSocketServer) readPump(client *Client) {
 	defer func() {
+		if r := recover(); r != nil {
+			// slog.Error("WebSocket recover error", "error", r)
+		}
 		s.unregister <- client
 		client.conn.Close()
 	}()
 
 	for {
-		_, _, err := client.conn.ReadMessage()
+		messageType, message, err := client.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				slog.Error("WebSocket read error", "error", err)
+				// removed during dev, ws conn doesnt like fast refreshing react components
+				// slog.Error("WebSocket read error", "error", err)
 			}
-			break
+		}
+		switch messageType {
+		case websocket.TextMessage:
+			// can only send msgs to overseer ws
+			if s.overseer != nil {
+				overseer.WebsocketTextHandler(client.conn, message)
+			}
 		}
 	}
 }
@@ -158,6 +207,33 @@ func (s *HttpServer) BroadcastStatus() {
 
 		s.wsServer.broadcast <- jsonData
 		time.Sleep(1 * time.Second)
+	}
+}
+
+func (s *HttpServer) BroadcastGameData() {
+	for {
+		gd := make(map[string]data.Data)
+
+		for _, supervisorName := range s.manager.AvailableSupervisors() {
+			if s.manager.Status(supervisorName).SupervisorStatus == koolo.InGame {
+				chr := config.Characters[supervisorName].CharacterName
+				gd[supervisorName] = s.manager.GetData(chr).Data
+			}
+		}
+
+		if len(gd) == 0 {
+			time.Sleep(1 * time.Second)
+			continue
+		}
+
+		jsonData, err := json.Marshal(gd)
+		if err != nil {
+			slog.Error("Failed to marshal game data", "error", err)
+			continue
+		}
+
+		s.wsGameData.gdStream <- jsonData
+		time.Sleep(3 * time.Second)
 	}
 }
 
@@ -270,9 +346,19 @@ func (s *HttpServer) getStatusData() IndexData {
 }
 
 func (s *HttpServer) Listen(port int) error {
-	s.wsServer = NewWebSocketServer()
+	s.wsServer = NewWebSocketServer(false, false)
 	go s.wsServer.Run()
 	go s.BroadcastStatus()
+
+	if config.Koolo.Overseer.Enabled {
+		s.wsServerOs = NewWebSocketServer(true, false)
+		go s.wsServerOs.Run()
+		overseer.Setup(s.wsServerOs, s.manager)
+
+		s.wsGameData = NewWebSocketServer(false, true)
+		go s.wsGameData.Run()
+		go s.BroadcastGameData()
+	}
 
 	http.HandleFunc("/", s.getRoot)
 	http.HandleFunc("/config", s.config)
@@ -288,6 +374,8 @@ func (s *HttpServer) Listen(port int) error {
 	http.HandleFunc("/initial-data", s.initialData)    // Web socket data
 
 	if config.Koolo.Overseer.Enabled {
+		http.HandleFunc("/overseer/ws", s.wsServerOs.HandleWebSocket)
+		http.HandleFunc("/overseer/ws/game-data", s.wsGameData.HandleWebSocket)
 		ServeOverseerAPI(s)
 	}
 
@@ -350,6 +438,9 @@ func (s *HttpServer) debugHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *HttpServer) startSupervisor(w http.ResponseWriter, r *http.Request) {
+	if config.Koolo.Overseer.Enabled {
+		enableCors(&w)
+	}
 	supervisorList := s.manager.AvailableSupervisors()
 	Supervisor := r.URL.Query().Get("characterName")
 

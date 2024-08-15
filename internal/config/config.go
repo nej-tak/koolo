@@ -204,6 +204,10 @@ type CharacterCfg struct {
 	Stash struct {
 		StockpileRejuvs bool `yaml:"stockpileRejuvs"`
 	} `yaml:"stash"`
+	Overseer struct {
+		Tmp             bool   `yaml:"tmp"`
+		ApiSupervisorId string `yaml:"apiSupervisorId"`
+	} `yaml:"overseer"`
 	Runtime struct {
 		Rules nip.Rules   `yaml:"-" json:"-"`
 		Drops []data.Item `yaml:"-" json:"-"`
@@ -342,6 +346,27 @@ func SaveSupervisorConfig(supervisorName string, config *CharacterCfg) error {
 	err = os.WriteFile(filePath, d, 0644)
 	if err != nil {
 		return fmt.Errorf("error writing supervisor config: %w", err)
+	}
+
+	return Load()
+}
+
+func CreateFromSource(sourceName string, targetName string) error {
+	if sourceName == "" {
+		return errors.New("source name cannot be empty")
+	}
+
+	if targetName == "" {
+		targetName = sourceName + "_tmp"
+	}
+
+	if _, err := os.Stat("config/" + targetName); !os.IsNotExist(err) {
+		return errors.New("configuration with that name already exists")
+	}
+
+	err := cp.Copy("config/"+sourceName, "config/"+targetName)
+	if err != nil {
+		return fmt.Errorf("error copying source config: %w", err)
 	}
 
 	return Load()
