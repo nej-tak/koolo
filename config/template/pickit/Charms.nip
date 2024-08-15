@@ -1,0 +1,155 @@
+////////////////////////Grand Charms///////////////////////////
+// Sunders & Gheeds
+[Name] == Grandcharm 	&& [Quality] == Unique # 
+
+[Name] == Grandcharm && [Quality] == Magic # [Fireskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # [Coldskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # [Lightningskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # [Trapsskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # [Martialartsskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # [Javelinandspearskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # [Palicombatskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # [Elementalskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # [Warcriesskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # [Poisonandboneskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Fireskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 10 || [Frw] >= 7) && [Coldskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 10 || [Frw] >= 7) && [Lightningskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Trapsskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Shadowdisciplinesskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Martialartsskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Javelinandspearskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Passiveandmagicskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Bowandcrossbowskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 10 || [Frw] >= 7) && [Palicombatskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Defensiveaurasskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 10 || [Frw] >= 7) && [Offensiveaurasskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 10 || [Frw] >= 7) && [Elementalskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Shapeshiftingskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Druidsummoningskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Warcriesskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Masteriesskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Barbcombatskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Poisonandboneskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Necromancersummoningskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # ([Fhr] >= 12 || [Maxhp] >= 20 || [Frw] >= 7) && [Cursesskilltab] >= 1
+[Name] == Grandcharm && [Quality] == Magic # [Coldresist]+[Fireresist]+[Lightresist]+[Poisonresist] >= 56
+[Name] == Grandcharm && [Quality] == Magic # [Coldresist]+[Fireresist]+[Lightresist]+[Poisonresist] >= 56 && [Frw] >= 7
+[Name] == Grandcharm && [Quality] == Magic # [Coldresist]+[Fireresist]+[Lightresist]+[Poisonresist] >= 56 && [Fhr] >= 12
+[Name] == Grandcharm && [Quality] == Magic # [Coldresist]+[Fireresist]+[Lightresist]+[Poisonresist] >= 56 && [Maxhp] >= 30
+[Name] == Grandcharm && [Quality] == Magic # [Tohit] >= 60  && [Maxdamage] >= 14
+[Name] == Grandcharm && [Quality] == Magic # [Tohit] >= 60  && [Maxdamage] >= 10 && [Frw] >= 7
+[Name] == Grandcharm && [Quality] == Magic # [Tohit] >= 60  && [Maxdamage] >= 10 && [Fhr] >= 12
+[Name] == Grandcharm && [Quality] == Magic # [Tohit] >= 60  && [Maxdamage] >= 9 && [Maxhp] >= 30
+[Name] == Grandcharm && [Quality] == Magic # [Tohit] >= 120 && [Maxhp] >= 35
+[Name] == Grandcharm && [Quality] == Magic # [Itemgoldbonus] >= 40
+[Name] == Grandcharm && [Quality] == Magic # [Itemgoldbonus] >= 40 && (([Coldresist]+[Fireresist]+[Lightresist]+[Poisonresist] >= 60) || [Coldresist] >= 26 || [Fireresist] >= 26 || [Lightresist] >= 26)
+[Name] == Grandcharm && [Quality] == Magic # [Itemgoldbonus] >= 40 && (([Maxdamage] >= 9 && [Tohit] >= 49) || [Mana] >= 40)
+
+////////////////////////Small Charms///////////////////////////
+[Name] == Smallcharm && [Quality] == Magic # [Tohit] >= 36 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Maxdamage] >= 1 || [Itemmagicbonus] >= 7 || [Maxhp] >= 19 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 		//Perfect Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Tohit] >= 36 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Maxdamage] >= 2 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 		//Perfect Prefix / Good Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Tohit] >= 26 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Maxdamage] >= 3 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 		//Good Prefix / Perfect Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Tohit] >= 26 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Maxdamage] >= 2 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 		//Good Prefix / Good Suffix Small Charm
+
+[Name] == Smallcharm && [Quality] == Magic # [Maxmana] >= 17 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Maxdamage] >= 1 || [Itemmagicbonus] >= 7 || [Maxhp] >= 19 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 	//Perfect Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Maxmana] >= 17 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Maxdamage] >= 2 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 	//Perfect Prefix / Good Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Maxmana] >= 12 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Maxdamage] >= 3 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 	//Good Prefix / Perfect Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Maxmana] >= 12 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Maxdamage] >= 2 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 	//Good Prefix / Good Suffix Small Charm
+
+[Name] == Smallcharm && [Quality] == Magic # [Fireresist]+[Lightresist]+[Coldresist]+[Poisonresist] >= 20 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Maxdamage] >= 2 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3)	//Perfect Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Fireresist]+[Lightresist]+[Coldresist]+[Poisonresist] >= 20 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Maxdamage] >= 2 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 	//Perfect Prefix / Good Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Fireresist]+[Lightresist]+[Coldresist]+[Poisonresist] >= 16 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Maxdamage] >= 2 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 	//Good Prefix / Perfect Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Fireresist]+[Lightresist]+[Coldresist]+[Poisonresist] >= 16 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Maxdamage] >= 1 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 	//Good Prefix / Good Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Fireresist]+[Lightresist]+[Coldresist]+[Poisonresist] >= 20																				//Perfect Prefix Small Charm
+
+[Name] == Smallcharm && [Quality] == Magic # [Fireresist] >= 11 && ([Fhr] >= 5 || [Maxdamage] >= 1 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 	//Perfect Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Fireresist] >= 9 && ([Fhr] >= 5 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 				//Good Prefix / Perfect Suffix Small Charm
+
+[Name] == Smallcharm && [Quality] == Magic # [Fireresist] >= 11 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Maxdamage] >= 1 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 	//Perfect Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Fireresist] >= 11 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 				//Perfect Prefix / Good Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Fireresist] >= 9 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 				//Good Prefix / Perfect Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Fireresist] >= 9 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 				//Good Prefix / Good Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Fireresist] >= 11																				//Perfect Prefix Small Charm
+
+[Name] == Smallcharm && [Quality] == Magic # [Coldresist] >= 11 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Maxdamage] >= 1 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 	//Perfect Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Coldresist] >= 11 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 				//Perfect Prefix / Good Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Coldresist] >= 9 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 				//Good Prefix / Perfect Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Coldresist] >= 9 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 				//Good Prefix / Good Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Coldresist] >= 11																				//Perfect Prefix Small Charm
+
+[Name] == Smallcharm && [Quality] == Magic # [Lightresist] >= 11 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Maxdamage] >= 1 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 	//Perfect Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Lightresist] >= 11 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 			//Perfect Prefix / Good Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Lightresist] >= 9 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 			//Good Prefix / Perfect Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Lightresist] >= 9 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 				//Good Prefix / Good Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Lightresist] >= 11																				//Perfect Prefix Small Charm
+
+[Name] == Smallcharm && [Quality] == Magic # [Poisonresist] >= 11 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Maxdamage] >= 1 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 	//Perfect Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Poisonresist] >= 11 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 			//Perfect Prefix / Good Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Poisonresist] >= 9 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 			//Good Prefix / Perfect Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Poisonresist] >= 9 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 			//Good Prefix / Good Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Poisonresist] >= 11																				//Perfect Prefix Small Charm
+
+[Name] == Smallcharm && [Quality] == Magic # [Mindamage] >= 1 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Maxdamage] >= 2 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3)	//Perfect Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Mindamage] >= 1 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Maxdamage] >= 2 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 	//Perfect Prefix / Good Suffix Small Charm
+
+[Name] == Smallcharm && [Quality] == Magic # [Maxdamage] >= 3 && [Tohit] >= 20																			//Perfect Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Maxdamage] >= 3 && [Tohit] >= 20 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 		//Perfect Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Maxdamage] >= 3 && [Tohit] >= 20 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 		//Perfect Prefix / Good Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Maxdamage] >= 2 && [Tohit] >= 15 && ([Fhr] >= 5 || [Itemgoldbonus] >= 10 || [Itemmagicbonus] >= 7 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 3) 		//Good Prefix / Perfect Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Maxdamage] >= 2 && [Tohit] >= 15 && ([Fhr] >= 5 || [Itemgoldbonus] >= 7 || [Itemmagicbonus] >= 5 || [Maxhp] >= 15 || [Strength] >= 1 || [Dexterity] >= 1 || [Frw] >= 3) 		//Good Prefix / Good Suffix Small Charm
+
+[Name] == Smallcharm && [Quality] == Magic # ([Poisonlength]*[Poisonmaxdam])/256 >= 91 				//Perfect Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Poisonlength]*[Poisonmaxdam]/256 >= 43  			//Good Prefix / Good Suffix Small Charm
+
+[Name] == Smallcharm && [Quality] == Magic # [Maxdamage] >= 2 && [Tohit] >= 19 && [Maxhp] >= 19 // 2/19/19 Or 3/20/20 
+[Name] == Smallcharm && [Quality] == Magic # ([Lightresist] + [Coldresist] + [Fireresist] + [Poisonresist]) >= 20 // 5 All Res Small Charm
+
+//[Name] == Smallcharm && [Quality] == Magic # [Fhr] >= 5			//Perfect Suffix Small Charm
+//[Name] == Smallcharm && [Quality] == Magic # [Maxhp] >= 20			//Perfect Suffix Small Charm
+//[Name] == Smallcharm && [Quality] == Magic # [Itemgoldbonus] >= 10		//Perfect Suffix Small Charm
+[Name] == Smallcharm && [Quality] == Magic # [Itemmagicbonus] >= 7		//Perfect Suffix Small Charm
+//[Name] == Smallcharm && [Quality] == Magic # [Strength] >= 2			//Perfect Suffix Small Charm
+//[Name] == Smallcharm && [Quality] == Magic # [Dexterity] >= 2			//Perfect Suffix Small Charm
+//[Name] == Smallcharm && [Quality] == Magic # [Frw] >= 3			//Perfect Suffix Small Charm
+
+////////////////////////Large Charms///////////////////////////
+[Name] == Largecharm && [Quality] == Magic # [Plusdefense] >= 60 && ([Fhr] >= 8 || [Itemgoldbonus] >= 22 || [Maxdamage] >= 2 || [Maxhp] >= 35 || [Strength] >= 5 || [Dexterity] >= 5 || [Frw] >= 5) 						//Perfect Large Charm
+
+//[Name] == Largecharm && [Quality] == Magic # [Tohit] >= 77 && ([Fhr] >= 8 || [Itemgoldbonus] >= 22 || [Maxdamage] >= 2 || [Maxhp] >= 35 || [Strength] >= 5 || [Dexterity] >= 5 || [Frw] >= 5) 							//Perfect Large Charm
+//[Name] == Largecharm && [Quality] == Magic # [Tohit] >= 50 && ([Fhr] >= 8 || [Itemgoldbonus] >= 15 || [Maxdamage] >= 2 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 5) 						//Good Large Charm
+
+//[Name] == Largecharm && [Quality] == Magic # [Maxmana] >= 34 && ([Fhr] >= 8 || [Itemgoldbonus] >= 22 || [Maxdamage] >= 2 || [Maxhp] >= 35 || [Strength] >= 5 || [Dexterity] >= 5 || [Frw] >= 5) 						//Perfect Large Charm
+//[Name] == Largecharm && [Quality] == Magic # [Maxmana] >= 25 && ([Fhr] >= 8 || [Itemgoldbonus] >= 15 || [Maxdamage] >= 2 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 5) 						//Good Large Charm
+
+//[Name] == Largecharm && [Quality] == Magic # [Fireresist]+[Lightresist]+[Coldresist]+[Poisonresist] >= 32 && ([Fhr] >= 8 || [Itemgoldbonus] >= 22 || [Maxdamage] >= 2 || [Maxhp] >= 35 || [Strength] >= 5 || [Dexterity] >= 5 || [Frw] >= 5)	//Perfect Large Charm
+//[Name] == Largecharm && [Quality] == Magic # [Fireresist] >= 15 && ([Fhr] >= 8 || [Itemgoldbonus] >= 22 || [Maxdamage] >= 2 || [Maxhp] >= 35 || [Strength] >= 5 || [Dexterity] >= 5 || [Frw] >= 5) 						//Perfect Large Charm
+
+//[Name] == Largecharm && [Quality] == Magic # [Coldresist] >= 15 && ([Fhr] >= 8 || [Itemgoldbonus] >= 22 || [Maxdamage] >= 2 || [Maxhp] >= 35 || [Strength] >= 5 || [Dexterity] >= 5 || [Frw] >= 5) 						//Perfect Large Charm
+
+//[Name] == Largecharm && [Quality] == Magic # [Lightresist] >= 15 && ([Fhr] >= 8 || [Itemgoldbonus] >= 22 || [Maxdamage] >= 2 || [Maxhp] >= 35 || [Strength] >= 5 || [Dexterity] >= 5 || [Frw] >= 5) 						//Perfect Large Charm
+
+//[Name] == Largecharm && [Quality] == Magic # [Poisonresist] >= 15 && ([Fhr] >= 8 || [Itemgoldbonus] >= 22 || [Maxdamage] >= 2 || [Maxhp] >= 35 || [Strength] >= 5 || [Dexterity] >= 5 || [Frw] >= 5) 						//Perfect Large Charm
+
+//[Name] == Largecharm && [Quality] == Magic # [Mindamage] >= 2 && ([Fhr] >= 8 || [Itemgoldbonus] >= 22 || [Maxhp] >= 35 || [Strength] >= 5 || [Dexterity] >= 5 || [Frw] >= 5) 									//Perfect Large Charm
+//[Name] == Largecharm && [Quality] == Magic # [Mindamage] >= 1 && ([Fhr] >= 8 || [Itemgoldbonus] >= 15 || [Maxdamage] >= 2 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 5) 						//Good Large Charm
+
+//[Name] == Largecharm && [Quality] == Magic # [Maxdamage] >= 2 && ([Fhr] >= 8 || [Itemgoldbonus] >= 22 || [Maxhp] >= 35 || [Strength] >= 5 || [Dexterity] >= 5 || [Frw] >= 5) 									//Perfect Large Charm
+//[Name] == Largecharm && [Quality] == Magic # [Maxdamage] >= 8 && [Tohit] >= 48																					//Perfect Large Charm
+//[Name] == Largecharm && [Quality] == Magic # [Maxdamage] >= 6 && [Tohit] >= 48 && ([Fhr] >= 8 || [Itemgoldbonus] >= 22 || [Maxhp] >= 35 || [Strength] >= 5 || [Dexterity] >= 5 || [Frw] >= 5) 							//Perfect Large Charm
+//[Name] == Largecharm && [Quality] == Magic # [Maxdamage] >= 2 && [Tohit] >= 30 && ([Fhr] >= 8 || [Itemgoldbonus] >= 15 || [Maxdamage] >= 2 || [Maxhp] >= 20 || [Strength] >= 2 || [Dexterity] >= 2 || [Frw] >= 5) 				//Good Large Charm
+
+//[Name] == Largecharm && [Quality] == Magic # [Itemmagicbonus] >= 6 && ([Fhr] >= 8 || [Itemgoldbonus] >= 22 || [Maxdamage] >= 2 || [Maxhp] >= 35 || [Strength] >= 5 || [Dexterity] >= 5 || [Frw] >= 5) 						//Perfect Large Charm
+
+////////////////////////Lld Charms///////////////////////////
+//[Name] == Largecharm && [Quality] == Magic # [Maxhp] >= 15 && ([Maxmana] >= 2 || [Tohit] >= 4 || [Poisonmaxdam] >= 8 || [Plusdefense] >= 2) && [Itemlevelreq] <= 12 
+//[Name] == Smallcharm && [Quality] == Magic # [Maxhp] >= 15 && ([Maxmana] >= 5 || [Tohit] >= 7 || [Fireresist] >= 5 || [Lightresist] >= 5 || [Poisonmaxdam] >= 15 || [Lightmaxdam] >= 9 || [Plusdefense] >= 14) && [Itemlevelreq] <= 30
+
+//[Name] == Largecharm && [Quality] == Magic # [Maxdamage] >= 6 && ([Maxhp] >= 18 || [Fhr] >= 8 || [Frw] >= 5 || [Strength] >= 5 || [Dexterity] >=5) && [Itemlevelreq] <= 30
+//[Name] == Smallcharm && [Quality] == Magic # [Maxdamage] >= 3 && ([Maxhp] >= 13 || [Fhr] >= 5 || [Frw] >= 3 || [Strength] >= 2 || [Dexterity] >= 2 || [Poisonmaxdam] >= 25 || [Lightmaxdam] >= 12) && [Itemlevelreq] <= 30
+
+//[Name] == Largecharm && [Quality] == Magic # [Maxhp] >= 18 && [Maxmana] >= 20 && [Itemlevelreq] <= 30
+//[Name] == Smallcharm && [Quality] == Magic # [Maxhp] >= 13 && ([Maxmana] >= 7 || [Tohit] >= 7 || [Fireresist] >= 9 || [Lightresist] >= 9 || [Plusdefense] >= 18) && [Itemlevelreq] <= 30
+
+//[Name] == Smallcharm && [Quality] == Magic # ([Dexterity] >= 1 || [Strength] >= 1) && ([Lightmaxdam] >= 4 || [Poisonmaxdam] >= 4 || [Tohit] >= 3) && [Itemlevelreq] <= 9 
+//[Name] == Smallcharm && [Quality] == Magic # [Maxmana] >= 12 && ([Dexterity] >= 2 || [Strength] >= 2 || [Frw] >= 3 || [Poisonmaxdam] >= 25 || [Lightmaxdam] >= 12 || [Fhr] >= 5) &&  [Itemlevelreq] <= 30
