@@ -390,51 +390,6 @@ func (b *Builder) calculateSkillPositionInUI(d game.Data, mainSkill bool, skillI
 		}
 	}
 
-	// 	if d.LegacyGraphics {
-	// 		// Classic Graphics
-	// 		skillOffsetXClassic := ui.MainSkillListFirstSkillXClassic + (ui.SkillListSkillOffsetClassic * column)
-
-	// 		if !mainSkill {
-	// 			skillOffsetXClassic = ui.SecondarySkillListFirstSkillXClassic - (ui.SkillListSkillOffsetClassic * column)
-	// 		}
-
-	// 		positionClassic := data.Position{
-	// 			X: skillOffsetXClassic,
-	// 			Y: ui.SkillListFirstSkillYClassic - ui.SkillListSkillOffsetClassic*row,
-	// 		}
-
-	// b.Logger.Info("Calculated position (Classic)",
-	// 	slog.Int("X", positionClassic.X),
-	// 	slog.Int("Y", positionClassic.Y),
-	// 	slog.Int("firstSkillX", ui.MainSkillListFirstSkillXClassic),
-	// 	slog.Int("firstSkillY", ui.SkillListFirstSkillYClassic),
-	// 	slog.Int("skillOffset", ui.SkillListSkillOffsetClassic))
-
-	// 		return positionClassic, true
-	// 	} else {
-	// 		// D2R Graphics
-	// 		skillOffsetX := ui.MainSkillListFirstSkillX - (ui.SkillListSkillOffset * column)
-
-	// 		if !mainSkill {
-	// 			skillOffsetX = ui.SecondarySkillListFirstSkillX + (ui.SkillListSkillOffset * column)
-	// 		}
-
-	// 		positionD2R := data.Position{
-	// 			X: skillOffsetX,
-	// 			Y: ui.SkillListFirstSkillY - ui.SkillListSkillOffset*row,
-	// 		}
-
-	// 		b.Logger.Info("Calculated position (D2R)",
-	// 			slog.Int("X", positionD2R.X),
-	// 			slog.Int("Y", positionD2R.Y),
-	// 			slog.Int("firstSkillX", ui.MainSkillListFirstSkillX),
-	// 			slog.Int("firstSkillY", ui.SkillListFirstSkillY),
-	// 			slog.Int("skillOffset", ui.SkillListSkillOffset))
-
-	// 		return positionD2R, true
-	// 	}
-	// }
-
 	if d.LegacyGraphics {
 		// Classic Graphics
 		skillOffsetXClassic := ui.MainSkillListFirstSkillXClassic + (ui.SkillListSkillOffsetClassic * column)
@@ -445,6 +400,7 @@ func (b *Builder) calculateSkillPositionInUI(d game.Data, mainSkill bool, skillI
 
 		// Logging the position for Classic Graphics
 		b.Logger.Info("Calculated Classic Graphics position",
+			slog.Int("Skill", int(skillID)),
 			slog.Int("X", skillOffsetXClassic),
 			slog.Int("Y", ui.SkillListFirstSkillYClassic-ui.SkillListSkillOffsetClassic*row),
 			slog.Int("Row", row),
@@ -467,6 +423,7 @@ func (b *Builder) calculateSkillPositionInUI(d game.Data, mainSkill bool, skillI
 
 		// Logging the position for D2R Graphics
 		b.Logger.Info("Calculated D2R Graphics position",
+			slog.Int("Skill", int(skillID)),
 			slog.Int("X", skillOffsetX),
 			slog.Int("Y", ui.SkillListFirstSkillY-ui.SkillListSkillOffset*row),
 			slog.Int("Row", row),
@@ -481,6 +438,144 @@ func (b *Builder) calculateSkillPositionInUI(d game.Data, mainSkill bool, skillI
 		}, true
 	}
 }
+
+// func (b *Builder) calculateSkillPositionInUI(d game.Data, mainSkill bool, skillID skill.ID) (data.Position, bool) {
+// 	var scrolls = []skill.ID{
+// 		skill.TomeOfTownPortal, skill.ScrollOfTownPortal, skill.TomeOfIdentify, skill.ScrollOfIdentify,
+// 	}
+
+// 	if _, found := d.PlayerUnit.Skills[skillID]; !found {
+// 		return data.Position{}, false
+// 	}
+
+// 	targetSkill := skill.Skills[skillID]
+// 	descs := make(map[skill.ID]skill.Skill)
+// 	row := 0
+// 	totalRows := make([]int, 0)
+// 	column := 0
+// 	skillsWithCharges := 0
+// 	for skID, points := range d.PlayerUnit.Skills {
+// 		sk := skill.Skills[skID]
+// 		// Skip skills that can not be bind
+// 		if sk.Desc().ListRow < 0 {
+// 			continue
+// 		}
+
+// 		// Skip skills that can not be bind to current mouse button
+// 		if (mainSkill == true && !sk.LeftSkill) || (mainSkill == false && !sk.RightSkill) {
+// 			continue
+// 		}
+
+// 		if points.Charges > 0 {
+// 			skillsWithCharges++
+// 			continue
+// 		}
+
+// 		if slices.Contains(scrolls, sk.ID) {
+// 			continue
+// 		}
+// 		descs[skID] = sk
+
+// 		if skID != targetSkill.ID && sk.Desc().Page == targetSkill.Desc().Page {
+// 			if sk.Desc().Row > targetSkill.Desc().Row {
+// 				column++
+// 			} else if sk.Desc().Row == targetSkill.Desc().Row && sk.Desc().Column > targetSkill.Desc().Column {
+// 				column++
+// 			}
+// 		}
+
+// 		totalRows = append(totalRows, sk.Desc().ListRow)
+// 		if row == targetSkill.Desc().ListRow {
+// 			continue
+// 		}
+
+// 		row++
+// 	}
+
+// 	slices.Sort(totalRows)
+// 	totalRows = slices.Compact(totalRows)
+
+// 	// If we don't have any skill of a specific tree, the entire row gets one line down
+// 	for i, currentRow := range totalRows {
+// 		if currentRow == row {
+// 			row = i
+// 			break
+// 		}
+// 	}
+
+// 	// Scrolls and charges are not in the same list
+// 	if slices.Contains(scrolls, skillID) {
+// 		column = skillsWithCharges
+// 		row = len(totalRows)
+// 		for _, skID := range scrolls {
+// 			if d.PlayerUnit.Skills[skID].Quantity > 0 {
+// 				if skID == skillID {
+// 					break
+// 				}
+// 				column++
+// 			}
+// 		}
+// 	}
+
+// 	if d.LegacyGraphics {
+// 		// Classic Graphics
+// 		// Determine the maximum column index
+// 		maxColumn := 0
+// 		for _, sk := range descs {
+// 			if sk.Desc().Column > maxColumn {
+// 				maxColumn = sk.Desc().Column
+// 			}
+// 		}
+
+// 		// Reverse the column index for legacy graphics
+// 		reversedColumn := maxColumn - column
+
+// 		skillOffsetXClassic := ui.MainSkillListFirstSkillXClassic + (ui.SkillListSkillOffsetClassic * reversedColumn)
+
+// 		if !mainSkill {
+// 			skillOffsetXClassic = ui.SecondarySkillListFirstSkillXClassic + (ui.SkillListSkillOffsetClassic * reversedColumn)
+// 		}
+
+// 		// Logging the position for Classic Graphics
+// 		b.Logger.Info("Calculated Classic Graphics position",
+// 			slog.Int("X", skillOffsetXClassic),
+// 			slog.Int("Y", ui.SkillListFirstSkillYClassic-ui.SkillListSkillOffsetClassic*row),
+// 			slog.Int("Row", row),
+// 			slog.Int("OriginalColumn", column),
+// 			slog.Int("ReversedColumn", reversedColumn),
+// 			slog.Bool("mainSkill", mainSkill),
+// 			slog.Int("Skill", int(skillID)),
+// 			slog.Bool("LegacyGraphics", d.LegacyGraphics),
+// 		)
+
+// 		return data.Position{
+// 			X: skillOffsetXClassic,
+// 			Y: ui.SkillListFirstSkillYClassic - ui.SkillListSkillOffsetClassic*row,
+// 		}, true
+// 	} else {
+// 		// D2R Graphics
+// 		skillOffsetX := ui.MainSkillListFirstSkillX - (ui.SkillListSkillOffset * column)
+
+// 		if !mainSkill {
+// 			skillOffsetX = ui.SecondarySkillListFirstSkillX + (ui.SkillListSkillOffset * column)
+// 		}
+
+// 		// Logging the position for D2R Graphics
+// 		b.Logger.Info("Calculated D2R Graphics position",
+// 			slog.Int("X", skillOffsetX),
+// 			slog.Int("Y", ui.SkillListFirstSkillY-ui.SkillListSkillOffset*row),
+// 			slog.Int("Row", row),
+// 			slog.Int("Column", column),
+// 			slog.Bool("mainSkill", mainSkill),
+// 			slog.Bool("LegacyGraphics", d.LegacyGraphics),
+// 		)
+
+// 		return data.Position{
+// 			X: skillOffsetX,
+// 			Y: ui.SkillListFirstSkillY - ui.SkillListSkillOffset*row,
+// 		}, true
+// 	}
+// }
 
 func (b *Builder) HireMerc() *Chain {
 	return NewChain(func(d game.Data) (actions []Action) {
