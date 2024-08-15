@@ -224,7 +224,21 @@ func (b *Builder) EnsureSkillBindings() *StepChainAction {
 
 		if len(notBoundSkills) > 0 {
 			steps = append(steps, step.SyncStep(func(d game.Data) error {
-				b.HID.Click(game.LeftButton, ui.SecondarySkillButtonX, ui.SecondarySkillButtonY)
+				if d.LegacyGraphics {
+					b.Logger.Info("Clicking Secondary Skill Button (Classic Graphics)",
+						slog.Int("X", ui.SecondarySkillButtonXClassic),
+						slog.Int("Y", ui.SecondarySkillButtonYClassic),
+						slog.Bool("LegacyGraphics", d.LegacyGraphics),
+					)
+					b.HID.Click(game.LeftButton, ui.SecondarySkillButtonXClassic, ui.SecondarySkillButtonYClassic)
+				} else {
+					b.Logger.Info("Clicking Secondary Skill Button (D2R Graphics)",
+						slog.Int("X", ui.SecondarySkillButtonX),
+						slog.Int("Y", ui.SecondarySkillButtonY),
+						slog.Bool("LegacyGraphics", d.LegacyGraphics),
+					)
+					b.HID.Click(game.LeftButton, ui.SecondarySkillButtonX, ui.SecondarySkillButtonY)
+				}
 				helper.Sleep(300)
 				b.HID.MovePointer(10, 10)
 				helper.Sleep(300)
@@ -236,6 +250,11 @@ func (b *Builder) EnsureSkillBindings() *StepChainAction {
 					if !found {
 						continue
 					}
+
+					b.Logger.Info("Moving pointer to skill position",
+						slog.Int("X", skillPosition.X),
+						slog.Int("Y", skillPosition.Y),
+					)
 
 					b.HID.MovePointer(skillPosition.X, skillPosition.Y)
 					helper.Sleep(100)
@@ -249,15 +268,38 @@ func (b *Builder) EnsureSkillBindings() *StepChainAction {
 
 		if d.PlayerUnit.LeftSkill != mainSkill {
 			steps = append(steps, step.SyncStep(func(d game.Data) error {
-				b.HID.Click(game.LeftButton, ui.MainSkillButtonX, ui.MainSkillButtonY)
+				if d.LegacyGraphics {
+					b.Logger.Info("Clicking Main Skill Button (Classic Graphics)",
+						slog.Int("X", ui.MainSkillButtonXClassic),
+						slog.Int("Y", ui.MainSkillButtonYClassic),
+						slog.Bool("LegacyGraphics", d.LegacyGraphics),
+					)
+					b.HID.Click(game.LeftButton, ui.MainSkillButtonXClassic, ui.MainSkillButtonYClassic)
+				} else {
+					b.Logger.Info("Clicking Main Skill Button (D2R Graphics)",
+						slog.Int("X", ui.MainSkillButtonX),
+						slog.Int("Y", ui.MainSkillButtonY),
+						slog.Bool("LegacyGraphics", d.LegacyGraphics),
+					)
+					b.HID.Click(game.LeftButton, ui.MainSkillButtonX, ui.MainSkillButtonY)
+				}
 				helper.Sleep(300)
 				b.HID.MovePointer(10, 10)
 				helper.Sleep(300)
 
 				skillPosition, found := b.calculateSkillPositionInUI(d, true, mainSkill)
 				if found {
+					b.Logger.Info("Moving pointer to main skill position",
+						slog.Int("X", skillPosition.X),
+						slog.Int("Y", skillPosition.Y),
+						slog.Bool("Found", found),
+					)
 					b.HID.MovePointer(skillPosition.X, skillPosition.Y)
 					helper.Sleep(100)
+					b.Logger.Info("Clicking to select main skill",
+						slog.Int("X", skillPosition.X),
+						slog.Int("Y", skillPosition.Y),
+					)
 					b.HID.Click(game.LeftButton, skillPosition.X, skillPosition.Y)
 					helper.Sleep(300)
 				}
@@ -348,15 +390,96 @@ func (b *Builder) calculateSkillPositionInUI(d game.Data, mainSkill bool, skillI
 		}
 	}
 
-	skillOffsetX := ui.MainSkillListFirstSkillX - (ui.SkillListSkillOffset * column)
-	if !mainSkill {
-		skillOffsetX = ui.SecondarySkillListFirstSkillX + (ui.SkillListSkillOffset * column)
-	}
+	// 	if d.LegacyGraphics {
+	// 		// Classic Graphics
+	// 		skillOffsetXClassic := ui.MainSkillListFirstSkillXClassic + (ui.SkillListSkillOffsetClassic * column)
 
-	return data.Position{
-		X: skillOffsetX,
-		Y: ui.SkillListFirstSkillY - ui.SkillListSkillOffset*row,
-	}, true
+	// 		if !mainSkill {
+	// 			skillOffsetXClassic = ui.SecondarySkillListFirstSkillXClassic - (ui.SkillListSkillOffsetClassic * column)
+	// 		}
+
+	// 		positionClassic := data.Position{
+	// 			X: skillOffsetXClassic,
+	// 			Y: ui.SkillListFirstSkillYClassic - ui.SkillListSkillOffsetClassic*row,
+	// 		}
+
+	// b.Logger.Info("Calculated position (Classic)",
+	// 	slog.Int("X", positionClassic.X),
+	// 	slog.Int("Y", positionClassic.Y),
+	// 	slog.Int("firstSkillX", ui.MainSkillListFirstSkillXClassic),
+	// 	slog.Int("firstSkillY", ui.SkillListFirstSkillYClassic),
+	// 	slog.Int("skillOffset", ui.SkillListSkillOffsetClassic))
+
+	// 		return positionClassic, true
+	// 	} else {
+	// 		// D2R Graphics
+	// 		skillOffsetX := ui.MainSkillListFirstSkillX - (ui.SkillListSkillOffset * column)
+
+	// 		if !mainSkill {
+	// 			skillOffsetX = ui.SecondarySkillListFirstSkillX + (ui.SkillListSkillOffset * column)
+	// 		}
+
+	// 		positionD2R := data.Position{
+	// 			X: skillOffsetX,
+	// 			Y: ui.SkillListFirstSkillY - ui.SkillListSkillOffset*row,
+	// 		}
+
+	// 		b.Logger.Info("Calculated position (D2R)",
+	// 			slog.Int("X", positionD2R.X),
+	// 			slog.Int("Y", positionD2R.Y),
+	// 			slog.Int("firstSkillX", ui.MainSkillListFirstSkillX),
+	// 			slog.Int("firstSkillY", ui.SkillListFirstSkillY),
+	// 			slog.Int("skillOffset", ui.SkillListSkillOffset))
+
+	// 		return positionD2R, true
+	// 	}
+	// }
+
+	if d.LegacyGraphics {
+		// Classic Graphics
+		skillOffsetXClassic := ui.MainSkillListFirstSkillXClassic + (ui.SkillListSkillOffsetClassic * column)
+
+		if !mainSkill {
+			skillOffsetXClassic = ui.SecondarySkillListFirstSkillXClassic - (ui.SkillListSkillOffsetClassic * column)
+		}
+
+		// Logging the position for Classic Graphics
+		b.Logger.Info("Calculated Classic Graphics position",
+			slog.Int("X", skillOffsetXClassic),
+			slog.Int("Y", ui.SkillListFirstSkillYClassic-ui.SkillListSkillOffsetClassic*row),
+			slog.Int("Row", row),
+			slog.Int("Column", column),
+			slog.Bool("mainSkill", mainSkill),
+			slog.Bool("LegacyGraphics", d.LegacyGraphics),
+		)
+
+		return data.Position{
+			X: skillOffsetXClassic,
+			Y: ui.SkillListFirstSkillYClassic - ui.SkillListSkillOffsetClassic*row,
+		}, true
+	} else {
+		// D2R Graphics
+		skillOffsetX := ui.MainSkillListFirstSkillX - (ui.SkillListSkillOffset * column)
+
+		if !mainSkill {
+			skillOffsetX = ui.SecondarySkillListFirstSkillX + (ui.SkillListSkillOffset * column)
+		}
+
+		// Logging the position for D2R Graphics
+		b.Logger.Info("Calculated D2R Graphics position",
+			slog.Int("X", skillOffsetX),
+			slog.Int("Y", ui.SkillListFirstSkillY-ui.SkillListSkillOffset*row),
+			slog.Int("Row", row),
+			slog.Int("Column", column),
+			slog.Bool("mainSkill", mainSkill),
+			slog.Bool("LegacyGraphics", d.LegacyGraphics),
+		)
+
+		return data.Position{
+			X: skillOffsetX,
+			Y: ui.SkillListFirstSkillY - ui.SkillListSkillOffset*row,
+		}, true
+	}
 }
 
 func (b *Builder) HireMerc() *Chain {
