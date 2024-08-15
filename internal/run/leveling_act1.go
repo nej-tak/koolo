@@ -28,45 +28,57 @@ func (a Leveling) act1() action.Action {
 
 		running = true
 
-		// clear Blood Moor until level 3
+		// Clear Blood Moor until level 3
 		if lvl, _ := d.PlayerUnit.FindStat(stat.Level, 0); lvl.Value < 3 {
 			return a.bloodMoor()
 		}
 
-		// clear Cold Plains until level 6
+		// Clear Cold Plains until level 6
 		if lvl, _ := d.PlayerUnit.FindStat(stat.Level, 0); lvl.Value < 6 {
 			return a.coldPlains()
 		}
 
-		if lvl, _ := d.PlayerUnit.FindStat(stat.Level, 0); lvl.Value == 6 || !d.Quests[quest.Act1DenOfEvil].Completed() {
+		// Do Den of Evil quest
+		if !d.Quests[quest.Act1DenOfEvil].Completed() {
 			return a.denOfEvil()
 		}
 
-		// clear Stony Field until level 9
-		if lvl, _ := d.PlayerUnit.FindStat(stat.Level, 0); lvl.Value < 9 {
+		// Clear Stony Field until level 8
+		if lvl, _ := d.PlayerUnit.FindStat(stat.Level, 0); lvl.Value < 8 {
 			return a.stonyField()
 		}
 
-		if !a.isCainInTown(d) && !d.Quests[quest.Act1TheSearchForCain].Completed() {
-			if a.isCairnKeyInInventory(d) {
-				a.logger.Info("Found Cairn key already, running tristram.")
-				var actions []action.Action
-				actions = append(actions, Tristram{baseRun: a.baseRun}.BuildActions()...)
-				return actions
-			}
-			return a.deckardCain()
-		}
-
+		// Too many depended factors that can go wrong for automatic leveling, removing for now
+		// if !a.isCainInTown(d) && !d.Quests[quest.Act1TheSearchForCain].Completed() {
+		// 	if a.isCairnKeyInInventory(d) {
+		// 		a.logger.Info("Found Cairn key already, running tristram.")
+		// 		var actions []action.Action
+		// 		actions = append(actions, Tristram{baseRun: a.baseRun}.BuildActions()...)
+		// 		return actions
+		// 	}
+		// 	return a.deckardCain()
+		// }
 		// do Tristram Runs until level 14
-		if lvl, _ := d.PlayerUnit.FindStat(stat.Level, 0); lvl.Value < 14 {
-			return a.tristram()
+		// if lvl, _ := d.PlayerUnit.FindStat(stat.Level, 0); lvl.Value < 14 {
+		// 	return a.tristram()
+		// }
+
+		// Clear areas up to the Tower before Countess runs until lvl 11
+		if lvl, _ := d.PlayerUnit.FindStat(stat.Level, 0); lvl.Value < 11 {
+			return a.ClearAreasBeforeTower()
 		}
 
-		// do Countess Runs until level 17
-		if lvl, _ := d.PlayerUnit.FindStat(stat.Level, 0); lvl.Value < 17 {
+		// Do Countess Runs until level 15
+		if lvl, _ := d.PlayerUnit.FindStat(stat.Level, 0); lvl.Value < 15 {
 			return a.countess()
 		}
 
+		// Clear Catacomb 2-3 until level 17
+		if lvl, _ := d.PlayerUnit.FindStat(stat.Level, 0); lvl.Value < 17 {
+			return a.catacombs()
+		}
+
+		// Kill Andariel to progress to Act 2
 		return a.andariel(d)
 	})
 }
@@ -165,9 +177,33 @@ func (a Leveling) tristram() []action.Action {
 	return Tristram{baseRun: a.baseRun}.BuildActions()
 }
 
+func (a Leveling) ClearAreasBeforeTower() []action.Action {
+	a.logger.Info("Starting Area Clearing before Tower run")
+	return []action.Action{
+		a.builder.WayPoint(area.DarkWood),
+		a.builder.Buff(),
+		a.builder.ClearArea(false, data.MonsterAnyFilter()),
+		a.builder.WayPoint(area.BlackMarsh),
+		a.builder.Buff(),
+		a.builder.ClearArea(false, data.MonsterAnyFilter()),
+	}
+}
+
 func (a Leveling) countess() []action.Action {
 	a.logger.Info("Starting Countess run")
 	return Countess{baseRun: a.baseRun}.BuildActions()
+}
+
+func (a Leveling) catacombs() []action.Action {
+	a.logger.Info("Starting Catacombs run")
+	return []action.Action{
+		a.builder.WayPoint(area.CatacombsLevel2),
+		a.builder.Buff(),
+		a.builder.ClearArea(false, data.MonsterAnyFilter()),
+		a.builder.MoveToArea(area.CatacombsLevel3),
+		a.builder.Buff(),
+		a.builder.ClearArea(false, data.MonsterAnyFilter()),
+	}
 }
 
 func (a Leveling) andariel(d game.Data) []action.Action {

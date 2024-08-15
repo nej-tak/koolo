@@ -40,18 +40,20 @@ func (b *Builder) MoveToArea(dst area.ID) *Chain {
 	openedDoors := make(map[object.Name]data.Position)
 	if dst == area.MonasteryGate {
 		return NewChain(func(d game.Data) []Action {
-			b.Logger.Debug("Monastery Gate detected, finding the door")
+			b.Logger.Debug("Monastery Gate detected, moving closer")
+			b.MoveToCoords(data.Position{X: 15139, Y: 5105})
 
 			// Move to specific coordinates before checking for the door
-			initialMoveAction := b.MoveToCoords(data.Position{X: 15139, Y: 5056})
+			MoveToMonasteryAction := b.MoveToCoords(data.Position{X: 15139, Y: 5056})
 
-			return append([]Action{initialMoveAction}, NewChain(func(d game.Data) []Action {
+			return append([]Action{MoveToMonasteryAction}, NewChain(func(d game.Data) []Action {
+				b.Logger.Debug("Moving through Monastery Gate and opening the gate")
 				for _, o := range d.Objects {
 					if o.IsDoor() && pather.DistanceFromMe(d, o.Position) < 10 && openedDoors[o.Name] != o.Position {
 						if o.Selectable {
 							return []Action{
 								NewStepChain(func(d game.Data) []step.Step {
-									b.Logger.Info("Door detected trying to open it...")
+									b.Logger.Info("Gate detected trying to open it...")
 									openedDoors[o.Name] = o.Position
 									return []step.Step{step.InteractObjectByID(o.ID, func(d game.Data) bool {
 										obj, found := d.Objects.FindByID(o.ID)
