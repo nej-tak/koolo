@@ -2,7 +2,6 @@ package overseer
 
 import (
 	"encoding/json"
-	"image"
 	"reflect"
 	"strings"
 	"sync"
@@ -10,7 +9,6 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/hectorgimenez/koolo/internal/event"
-	"github.com/hectorgimenez/koolo/internal/game"
 )
 
 var (
@@ -34,6 +32,12 @@ type OverseerTerminal struct {
 }
 
 func (t *OverseerTerminal) wsSend(msg []byte) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	t.conn.WriteMessage(1, msg)
+}
+
+func (t *OverseerTerminal) Respond(msg []byte) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	t.conn.WriteMessage(1, msg)
@@ -110,13 +114,4 @@ func toCamelCase(s string) string {
 
 // my dumb ass couldnt figure out how to reference
 // the struct in koolo/manager without circular import
-type KSupervisorManager interface {
-	AvailableSupervisors() []string
-	GetData(characterName string) game.Data
-	GetImg(characterName string) (image.Image, error)
-	Start(supervisorName string) error
-	Stop(supervisor string)
-	StopAll()
-	StopAllByName()
-	TogglePause(supervisor string)
-}
+type KSupervisorManager interface{}

@@ -17,3 +17,19 @@ func TerminalMessageReceived(msg string, terminal *OverseerTerminal) TerminalMes
 		Terminal:  terminal,
 	}
 }
+
+type IngameTerminalMsgEvent struct {
+	event.BaseEvent
+	Target   string
+	Command  string
+	Terminal *OverseerTerminal
+}
+
+func IngameTerminalMsg(target, command string, terminal *OverseerTerminal) IngameTerminalMsgEvent {
+	return IngameTerminalMsgEvent{
+		BaseEvent: event.Text("Overseer", "IngameTerminalMsg"),
+		Target:    target,
+		Command:   command,
+		Terminal:  terminal,
+	}
+}

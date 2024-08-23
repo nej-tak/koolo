@@ -2,13 +2,12 @@ package overseer
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
-
-	"github.com/hectorgimenez/koolo/internal/config"
 )
 
 type OverseerApi struct {
@@ -96,7 +95,7 @@ func (api *OverseerApi) CreateApiRecord(collection string, fields map[string]str
 }
 
 func (api *OverseerApi) PostEvent(name, supervisor string, fieldValues map[string]interface{}) error {
-	apiId := config.Characters[supervisor].Overseer.ApiSupervisorId
+	apiId := "qwe" //config.Characters[supervisor].Overseer.ApiSupervisorId
 
 	if apiId == "" {
 		return fmt.Errorf("API id not set")
@@ -113,7 +112,7 @@ func (api *OverseerApi) PostEvent(name, supervisor string, fieldValues map[strin
 }
 
 func (api *OverseerApi) PostError(err, supervisor string, screenshot []byte) error {
-	apiId := config.Characters[supervisor].Overseer.ApiSupervisorId
+	apiId := "qwe" //config.Characters[supervisor].Overseer.ApiSupervisorId
 
 	if apiId == "" {
 		return fmt.Errorf("API id not set")
@@ -127,11 +126,31 @@ func (api *OverseerApi) PostError(err, supervisor string, screenshot []byte) err
 	return api.CreateApiRecord("errors", fields, nil, "screenshot", "screenshot", screenshot)
 }
 
-func (api *OverseerApi) WebhookStopped() {
-	url := fmt.Sprintf("%s/webhook/stopped", api.baseURL)
-	resp, err := http.Get(url)
+// we dont care about errors, if it fails at any point just bail to not
+// interfere with bot
+func (api *OverseerApi) GzipAndPost(seed, difficulty string, lvls interface{}) {
+	jsonData, err := json.Marshal(lvls)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
+
+	var compressedData bytes.Buffer
+	gzipWriter := gzip.NewWriter(&compressedData)
+	_, err = gzipWriter.Write(jsonData)
+	if err != nil {
+		return
+	}
+
+	if err := gzipWriter.Close(); err != nil {
+		return
+	}
+
+	fields := map[string]string{
+		"seed":       seed,
+		"difficulty": difficulty,
+	}
+	fileName := "json.gz"
+
+	// Use CreateApiRecord to upload the compressed JSON data
+	_ = api.CreateApiRecord("map_data", fields, nil, "compressed", fileName, compressedData.Bytes())
 }
