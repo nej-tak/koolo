@@ -226,14 +226,24 @@ func (mng *SupervisorManager) GetData(characterName string) game.Data {
 	return game.Data{}
 }
 
-func (mng *SupervisorManager) GetImg(characterName string) (image.Image, error) {
+func (mng *SupervisorManager) GetImg(supervisorName string) (image.Image, error) {
 	for name, supervisor := range mng.supervisors {
-		if name == characterName {
+		if name == supervisorName {
 			return supervisor.GetImg()
 		}
 	}
 
 	return nil, nil
+}
+
+func (mng *SupervisorManager) GetMapSeed(supervisorName string) string {
+	for name, supervisor := range mng.supervisors {
+		if name == supervisorName {
+			return supervisor.GetMapSeed()
+		}
+	}
+
+	return ""
 }
 
 func (mng *SupervisorManager) buildSupervisor(supervisorName string, logger *slog.Logger, restartFunc func()) (Supervisor, *game.CrashDetector, error) {

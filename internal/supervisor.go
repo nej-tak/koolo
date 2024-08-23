@@ -6,6 +6,7 @@ import (
 	"image"
 	"log/slog"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -25,6 +26,7 @@ type Supervisor interface {
 	SetWindowPosition(x, y int)
 	GetData() game.Data
 	GetImg() (image.Image, error)
+	GetMapSeed() string
 }
 
 type baseSupervisor struct {
@@ -62,6 +64,10 @@ func (s *baseSupervisor) Stats() Stats {
 
 func (s *baseSupervisor) GetData() game.Data {
 	return s.c.Reader.GetData(false)
+}
+
+func (s *baseSupervisor) GetMapSeed() string {
+	return strconv.Itoa(int(s.c.Reader.CachedMapSeed))
 }
 
 func (s *baseSupervisor) GetImg() (image.Image, error) {

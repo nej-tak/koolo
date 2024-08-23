@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
+	"log/slog"
 	"net/http"
-	"os"
-	"path/filepath"
 	"reflect"
 	"time"
 
+	"github.com/hectorgimenez/d2go/pkg/data"
 	koolo "github.com/hectorgimenez/koolo/internal"
 	"github.com/hectorgimenez/koolo/internal/config"
 	"github.com/hectorgimenez/koolo/internal/event"
@@ -30,6 +30,80 @@ type AvailableOptions struct {
 	AvailableRuns    map[config.Run]interface{} `json:"runs"`
 	AvailableRecipes []string                   `json:"recipes"`
 	AvailableTZs     map[int]string             `json:"tzs"`
+}
+
+type OsGameData struct {
+	Data       data.Data `json:"data"`
+	Seed       string    `json:"seed"`
+	Difficulty string    `json:"difficulty"`
+}
+
+func ServeOverseerAPI(s *HttpServer) {
+	http.HandleFunc("/overseer/test", s.Test)
+	http.HandleFunc("/overseer/config/koolo", s.KooloConfig)
+	http.HandleFunc("/overseer/config/supervisors", s.GetSupervisorConfigs)
+	http.HandleFunc("/overseer/config/supervisor", s.SupervisorConfig)
+	http.HandleFunc("/overseer/game-data", s.initialGameData)
+	http.HandleFunc("/overseer/available", s.GetAvailableOptions)
+	http.HandleFunc("/overseer/img", s.ShareScreen)
+}
+
+func (s *HttpServer) BroadcastGameData() {
+	for {
+		gd := make(map[string]OsGameData)
+
+		for _, supervisorName := range s.manager.AvailableSupervisors() {
+			st := s.manager.Status(supervisorName).SupervisorStatus
+			if st == koolo.InGame || st == koolo.Paused {
+				data := s.manager.GetData(supervisorName)
+				gd[supervisorName] = OsGameData{
+					Data:       data.Data,
+					Seed:       s.manager.GetMapSeed(supervisorName),
+					Difficulty: string(data.CharacterCfg.Game.Difficulty),
+				}
+			}
+		}
+
+		if len(gd) == 0 {
+			time.Sleep(1 * time.Second)
+			continue
+		}
+
+		jsonData, err := json.Marshal(gd)
+		if err != nil {
+			slog.Error("Failed to marshal game data", "error", err)
+			continue
+		}
+
+		s.wsGameData.gdStream <- jsonData
+		time.Sleep(2 * time.Second)
+	}
+}
+
+func (s *HttpServer) initialGameData(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+
+	supervisorName := r.URL.Query().Get("supervisor")
+	if supervisorName == "" {
+		http.Error(w, "?supervisor= name is required", http.StatusBadRequest)
+		return
+	}
+
+	data := s.manager.GetData(supervisorName)
+
+	osGameData := OsGameData{
+		Data:       data.Data,
+		Seed:       s.manager.GetMapSeed(supervisorName),
+		Difficulty: string(data.CharacterCfg.Game.Difficulty),
+	}
+
+	jsonData, err := json.Marshal(osGameData)
+	if err != nil {
+		http.Error(w, "Failed to serialize game data", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
 }
 
 func (s *WebSocketServer) BroadcastToOverseerWs(message []byte) {
@@ -150,21 +224,6 @@ func (s *HttpServer) GetAvailableOptions(w http.ResponseWriter, r *http.Request)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)
-}
-
-func ServeOverseerAPI(s *HttpServer) {
-	exePath, _ := os.Executable()
-	logsDir := filepath.Join(filepath.Dir(exePath), "logs")
-	logsFS := http.Dir(logsDir)
-
-	http.Handle("/overseer/logs/", http.StripPrefix("/overseer/logs/", http.FileServer(logsFS)))
-
-	http.HandleFunc("/overseer/test", s.Test)
-	http.HandleFunc("/overseer/config/koolo", s.KooloConfig)
-	http.HandleFunc("/overseer/config/supervisors", s.GetSupervisorConfigs)
-	http.HandleFunc("/overseer/config/supervisor", s.SupervisorConfig)
-	http.HandleFunc("/overseer/available", s.GetAvailableOptions)
-	http.HandleFunc("/overseer/img", s.ShareScreen)
 }
 
 func (s *HttpServer) ShareScreen(w http.ResponseWriter, r *http.Request) {

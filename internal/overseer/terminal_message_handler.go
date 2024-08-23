@@ -1,44 +1,36 @@
 package overseer
 
 import (
-	"errors"
 	"reflect"
 	"strings"
 
 	"github.com/gorilla/websocket"
-	"github.com/hectorgimenez/d2go/pkg/data/difficulty"
-	"github.com/hectorgimenez/koolo/internal/config"
 	"github.com/hectorgimenez/koolo/internal/event"
 )
 
 type TmpConfigOverrides struct {
-	diff difficulty.Difficulty
+	//diff difficulty.Difficulty
 }
 
 func (o *Overseer) TerminalMessageHandler(evt TerminalMessageReceivedEvent) {
 	args := strings.Fields(evt.Msg)
 
-	if len(args) < 1 {
-		return
-	}
-
 	handlers := map[string]func(TerminalMessageReceivedEvent, []string){
-		"copy": wrapHandlerFn(handleCopy),
-		"tmp":  wrapHandlerFn(handleTmpCopy),
+		//"copy": wrapHandlerFn(handleCopy),
+		//"tmp":  wrapHandlerFn(handleTmpCopy),
 	}
 
-	supervisorName := args[0] // legacy for now, atm will be $ from the overseer-react-terminal
-	cmd := args[1]
+	cmd := args[0]
 	cmdArgs := []string{}
 
-	if len(args) > 2 {
-		cmdArgs = args[2:]
+	if len(args) > 1 {
+		cmdArgs = args[1:]
 	}
 
 	if handler, found := handlers[cmd]; found {
 		handler(evt, cmdArgs)
 	} else {
-		handleUnknown(evt, supervisorName)
+		handleUnknown(evt, "")
 	}
 }
 
@@ -71,6 +63,7 @@ func callHandlerFn(fn interface{}, evt TerminalMessageReceivedEvent, args []stri
 	reflect.ValueOf(fn).Call(in)
 }
 
+/*
 func handleTmpCopy(evt TerminalMessageReceivedEvent, source, diff string) {
 	err := makeTmpCopy(source, &TmpConfigOverrides{
 		diff: difficulty.Difficulty(diff),
@@ -90,6 +83,7 @@ func handleCopy(evt TerminalMessageReceivedEvent, source, target string) {
 	}
 	respond(evt, "Created new config: "+target)
 }
+*/
 
 func respond(evt TerminalMessageReceivedEvent, response string) {
 	evt.Terminal.wsSend([]byte(response))
@@ -104,9 +98,30 @@ func WebsocketTextHandler(conn *websocket.Conn, message []byte) {
 		conn: conn,
 	}
 
+	if isInGameMsg(string(message)) {
+		target, command := parseInGameMsg(string(message))
+		if target != "" {
+			event.Send(IngameTerminalMsg(target, command, terminal))
+			return
+		}
+	}
+
 	event.Send(TerminalMessageReceived(string(message), terminal))
 }
 
+func isInGameMsg(msg string) bool {
+	return strings.HasPrefix(msg, "@")
+}
+
+func parseInGameMsg(msg string) (string, string) {
+	parts := strings.SplitN(msg[1:], " ", 2)
+	if len(parts) == 2 {
+		return parts[0], parts[1]
+	}
+	return "", ""
+}
+
+/*
 func makeTmpCopy(sourceName string, overrides *TmpConfigOverrides) error {
 	if sourceName == "" {
 		return errors.New("missing source supervisor name")
@@ -130,3 +145,4 @@ func makeTmpCopy(sourceName string, overrides *TmpConfigOverrides) error {
 
 	return config.SaveSupervisorConfig(tmp, cfg)
 }
+*/

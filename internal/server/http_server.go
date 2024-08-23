@@ -210,33 +210,6 @@ func (s *HttpServer) BroadcastStatus() {
 	}
 }
 
-func (s *HttpServer) BroadcastGameData() {
-	for {
-		gd := make(map[string]data.Data)
-
-		for _, supervisorName := range s.manager.AvailableSupervisors() {
-			if s.manager.Status(supervisorName).SupervisorStatus == koolo.InGame {
-				// the arg is not actually charactername but supervisorname
-				gd[supervisorName] = s.manager.GetData(supervisorName).Data
-			}
-		}
-
-		if len(gd) == 0 {
-			time.Sleep(1 * time.Second)
-			continue
-		}
-
-		jsonData, err := json.Marshal(gd)
-		if err != nil {
-			slog.Error("Failed to marshal game data", "error", err)
-			continue
-		}
-
-		s.wsGameData.gdStream <- jsonData
-		time.Sleep(3 * time.Second)
-	}
-}
-
 func New(logger *slog.Logger, manager *koolo.SupervisorManager) (*HttpServer, error) {
 	var templates *template.Template
 	helperFuncs := template.FuncMap{

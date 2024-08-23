@@ -14,6 +14,7 @@ import (
 	"github.com/hectorgimenez/koolo/internal/config"
 	"github.com/hectorgimenez/koolo/internal/game/map_client"
 	"github.com/hectorgimenez/koolo/internal/helper"
+	"github.com/hectorgimenez/koolo/internal/overseer"
 	"github.com/lxn/win"
 )
 
@@ -90,8 +91,9 @@ func (gd *MemoryReader) updateWindowPositionData() {
 func (gd *MemoryReader) GetData(isNewGame bool) Data {
 
 	d := gd.GameReader.GetData()
-	origin := gd.GetCachedMapData(isNewGame).Origin(d.PlayerUnit.Area)
-	npcs, exits, objects, rooms := gd.GetCachedMapData(isNewGame).NPCsExitsAndObjects(origin, d.PlayerUnit.Area)
+	md := gd.GetCachedMapData(isNewGame)
+	origin := md.Origin(d.PlayerUnit.Area)
+	npcs, exits, objects, rooms := md.NPCsExitsAndObjects(origin, d.PlayerUnit.Area)
 	// This hacky thing is because sometimes if the objects are far away we can not fetch them, basically WP.
 	memObjects := gd.Objects(d.PlayerUnit.Position, d.HoverData)
 	for _, clientObject := range objects {
@@ -111,7 +113,15 @@ func (gd *MemoryReader) GetData(isNewGame bool) Data {
 	d.AdjacentLevels = exits
 	d.Rooms = rooms
 	d.Objects = memObjects
-	d.CollisionGrid = gd.GetCachedMapData(isNewGame).CollisionGrid(d.PlayerUnit.Area)
+	d.CollisionGrid = md.CollisionGrid(d.PlayerUnit.Area)
+
+	if isNewGame {
+		overseer.GetInstance().Api.GzipAndPost(
+			strconv.Itoa(int(gd.CachedMapSeed)),
+			string(config.Characters[gd.supervisorName].Game.Difficulty),
+			md,
+		)
+	}
 
 	return Data{Data: d, CharacterCfg: *gd.cfg}
 }
