@@ -98,6 +98,8 @@ type CharacterCfg struct {
 		Difficulty             difficulty.Difficulty `yaml:"difficulty"`
 		RandomizeRuns          bool                  `yaml:"randomizeRuns"`
 		Runs                   []Run                 `yaml:"runs"`
+		CreateLobbyGames       bool                  `yaml:"createLobbyGames"`
+		PublicGameCounter      int                   `yaml:"-"`
 		Pindleskin             struct {
 			SkipOnImmunities []stat.Resist `yaml:"skipOnImmunities"`
 		} `yaml:"pindleskin"`
@@ -129,6 +131,10 @@ type CharacterCfg struct {
 			OpenChests        bool `yaml:"openChests"`
 			FocusOnElitePacks bool `yaml:"focusOnElitePacks"`
 		} `yaml:"drifter_cavern"`
+		SpiderCavern struct {
+			OpenChests        bool `yaml:"openChests"`
+			FocusOnElitePacks bool `yaml:"focusOnElitePacks"`
+		} `yaml:"spider_cavern"`
 		Mephisto struct {
 			KillCouncilMembers bool `yaml:"killCouncilMembers"`
 			OpenChests         bool `yaml:"openChests"`
@@ -179,11 +185,8 @@ type CharacterCfg struct {
 		} `yaml:"quests"`
 	} `yaml:"game"`
 	Companion struct {
-		Enabled          bool   `yaml:"enabled"`
 		Leader           bool   `yaml:"leader"`
 		LeaderName       string `yaml:"leaderName"`
-		Attack           bool   `yaml:"attack"`
-		FollowLeader     bool   `yaml:"followLeader"`
 		GameNameTemplate string `yaml:"gameNameTemplate"`
 		GamePassword     string `yaml:"gamePassword"`
 	} `yaml:"companion"`
@@ -240,19 +243,34 @@ func (bm BeltColumns) Total(potionType data.PotionType) int {
 // Load reads the config.ini file and returns a Config struct filled with data from the ini file
 func Load() error {
 	Characters = make(map[string]*CharacterCfg)
-	r, err := os.Open("config/koolo.yaml")
+
+	// Get the absolute path of the current working directory
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("error getting current working directory: %w", err)
+	}
+
+	// Function to get absolute path
+	getAbsPath := func(relPath string) string {
+		return filepath.Join(cwd, relPath)
+	}
+
+	kooloPath := getAbsPath("config/koolo.yaml")
+	r, err := os.Open(kooloPath)
 	if err != nil {
 		return fmt.Errorf("error loading koolo.yaml: %w", err)
 	}
+	defer r.Close()
 
 	d := yaml.NewDecoder(r)
 	if err = d.Decode(&Koolo); err != nil {
-		return fmt.Errorf("error reading config: %w", err)
+		return fmt.Errorf("error reading config %s: %w", kooloPath, err)
 	}
 
-	entries, err := os.ReadDir("config")
+	configDir := getAbsPath("config")
+	entries, err := os.ReadDir(configDir)
 	if err != nil {
-		return fmt.Errorf("error reading config: %w", err)
+		return fmt.Errorf("error reading config directory %s: %w", configDir, err)
 	}
 
 	for _, entry := range entries {
@@ -261,25 +279,29 @@ func Load() error {
 		}
 
 		charCfg := CharacterCfg{}
-		r, err = os.Open("config/" + entry.Name() + "/config.yaml")
+		charConfigPath := getAbsPath(filepath.Join("config", entry.Name(), "config.yaml"))
+		r, err = os.Open(charConfigPath)
 		if err != nil {
 			return fmt.Errorf("error loading config.yaml: %w", err)
 		}
+		defer r.Close()
 
 		d := yaml.NewDecoder(r)
 		if err = d.Decode(&charCfg); err != nil {
-			return fmt.Errorf("error reading %s character config: %w", entry.Name(), err)
+			return fmt.Errorf("error reading %s character config: %w", charConfigPath, err)
 		}
 
-		rules, err := nip.ReadDir("config/" + entry.Name() + "/pickit/")
+		pickitPath := getAbsPath(filepath.Join("config", entry.Name(), "pickit")) + "\\"
+		rules, err := nip.ReadDir(pickitPath)
 		if err != nil {
-			return err
+			return fmt.Errorf("error reading pickit directory %s: %w", pickitPath, err)
 		}
 
 		if len(charCfg.Game.Runs) > 0 && charCfg.Game.Runs[0] == "leveling" {
-			levelingRules, err := nip.ReadDir("config/" + entry.Name() + "/pickit_leveling/")
+			levelingPickitPath := getAbsPath(filepath.Join("config", entry.Name(), "pickit_leveling")) + "\\"
+			levelingRules, err := nip.ReadDir(levelingPickitPath)
 			if err != nil {
-				return err
+				return fmt.Errorf("error reading pickit_leveling directory %s: %w", levelingPickitPath, err)
 			}
 			rules = append(rules, levelingRules...)
 		}

@@ -20,18 +20,21 @@ import (
 	"github.com/hectorgimenez/d2go/pkg/data/area"
 	"github.com/hectorgimenez/d2go/pkg/data/difficulty"
 	"github.com/hectorgimenez/d2go/pkg/data/stat"
-	koolo "github.com/hectorgimenez/koolo/internal"
 	"github.com/hectorgimenez/koolo/internal/config"
-	"github.com/hectorgimenez/koolo/internal/helper"
 	"github.com/hectorgimenez/koolo/internal/overseer"
+
+	"github.com/hectorgimenez/koolo/internal/game"
+	"github.com/hectorgimenez/koolo/internal/v2/bot"
+	ctx "github.com/hectorgimenez/koolo/internal/v2/context"
+	"github.com/hectorgimenez/koolo/internal/v2/utils"
 )
 
 type HttpServer struct {
-	logger     *slog.Logger
-	server     *http.Server
-	manager    *koolo.SupervisorManager
-	templates  *template.Template
-	wsServer   *WebSocketServer
+	logger    *slog.Logger
+	server    *http.Server
+	manager   *bot.SupervisorManager
+	templates *template.Template
+	wsServer  *WebSocketServer
 	wsServerOs *WebSocketServer
 	wsGameData *WebSocketServer
 }
@@ -210,7 +213,7 @@ func (s *HttpServer) BroadcastStatus() {
 	}
 }
 
-func New(logger *slog.Logger, manager *koolo.SupervisorManager) (*HttpServer, error) {
+func New(logger *slog.Logger, manager *bot.SupervisorManager) (*HttpServer, error) {
 	var templates *template.Template
 	helperFuncs := template.FuncMap{
 		"isInSlice": func(slice []stat.Resist, value string) bool {
@@ -299,7 +302,7 @@ func (s *HttpServer) initialData(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *HttpServer) getStatusData() IndexData {
-	status := make(map[string]koolo.Stats)
+	status := make(map[string]bot.Stats)
 	drops := make(map[string]int)
 
 	for _, supervisorName := range s.manager.AvailableSupervisors() {
@@ -374,7 +377,7 @@ func (s *HttpServer) Stop() error {
 }
 
 func (s *HttpServer) getRoot(w http.ResponseWriter, r *http.Request) {
-	if !helper.HasAdminPermission() {
+	if !utils.HasAdminPermission() {
 		s.templates.ExecuteTemplate(w, "templates/admin_required.gohtml", nil)
 		return
 	}
@@ -396,8 +399,20 @@ func (s *HttpServer) debugData(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Character name is required", http.StatusBadRequest)
 		return
 	}
-	gameData := s.manager.GetData(characterName)
-	jsonData, err := json.Marshal(gameData)
+
+	type DebugData struct {
+		DebugData *ctx.Debug
+		GameData  *game.Data
+	}
+
+	context := s.manager.GetContext(characterName)
+
+	debugData := DebugData{
+		DebugData: context.ContextDebug,
+		GameData:  context.Data,
+	}
+
+	jsonData, err := json.Marshal(debugData)
 	if err != nil {
 		http.Error(w, "Failed to serialize game data", http.StatusInternalServerError)
 		return
@@ -432,7 +447,7 @@ func (s *HttpServer) startSupervisor(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		if s.manager.GetSupervisorStats(sup).SupervisorStatus == koolo.Starting {
+		if s.manager.GetSupervisorStats(sup).SupervisorStatus == bot.Starting {
 
 			// Prevent launching if we're using token auth & another client is starting (no matter what auth method)
 			if supCfg.AuthMethod == "TokenAuth" {
@@ -469,12 +484,12 @@ func (s *HttpServer) togglePause(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *HttpServer) index(w http.ResponseWriter) {
-	status := make(map[string]koolo.Stats)
+	status := make(map[string]bot.Stats)
 	drops := make(map[string]int)
 
 	for _, supervisorName := range s.manager.AvailableSupervisors() {
-		status[supervisorName] = koolo.Stats{
-			SupervisorStatus: koolo.NotStarted,
+		status[supervisorName] = bot.Stats{
+			SupervisorStatus: bot.NotStarted,
 		}
 
 		status[supervisorName] = s.manager.Status(supervisorName)
@@ -639,6 +654,7 @@ func (s *HttpServer) characterSettings(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Game
+		cfg.Game.CreateLobbyGames = r.Form.Has("createLobbyGames")
 		cfg.Game.MinGoldPickupThreshold, _ = strconv.Atoi(r.Form.Get("gameMinGoldPickupThreshold"))
 		cfg.Game.Difficulty = difficulty.Difficulty(r.Form.Get("gameDifficulty"))
 		cfg.Game.RandomizeRuns = r.Form.Has("gameRandomizeRuns")
@@ -672,6 +688,8 @@ func (s *HttpServer) characterSettings(w http.ResponseWriter, r *http.Request) {
 		cfg.Game.Mausoleum.FocusOnElitePacks = r.Form.Has("gameMausoleumFocusOnElitePacks")
 		cfg.Game.DrifterCavern.OpenChests = r.Form.Has("gameDrifterCavernOpenChests")
 		cfg.Game.DrifterCavern.FocusOnElitePacks = r.Form.Has("gameDrifterCavernFocusOnElitePacks")
+		cfg.Game.SpiderCavern.OpenChests = r.Form.Has("gameSpiderCavernOpenChests")
+		cfg.Game.SpiderCavern.FocusOnElitePacks = r.Form.Has("gameSpiderCavernFocusOnElitePacks")
 		cfg.Game.Mephisto.KillCouncilMembers = r.Form.Has("gameMephistoKillCouncilMembers")
 		cfg.Game.Mephisto.OpenChests = r.Form.Has("gameMephistoOpenChests")
 		cfg.Game.Tristram.ClearPortal = r.Form.Has("gameTristramClearPortal")
@@ -732,10 +750,7 @@ func (s *HttpServer) characterSettings(w http.ResponseWriter, r *http.Request) {
 		// Companion
 
 		// Companion config
-		cfg.Companion.Enabled = r.Form.Has("companionEnabled")
 		cfg.Companion.Leader = r.Form.Has("companionLeader")
-		cfg.Companion.Attack = r.Form.Has("companionAttack")
-		cfg.Companion.FollowLeader = r.Form.Has("companionFollowLeader")
 		cfg.Companion.LeaderName = r.Form.Get("companionLeaderName")
 		cfg.Companion.GameNameTemplate = r.Form.Get("companionGameNameTemplate")
 		cfg.Companion.GamePassword = r.Form.Get("companionGamePassword")

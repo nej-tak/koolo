@@ -1,11 +1,10 @@
 package game
 
 import (
-	"fmt"
 	"image"
 	"unsafe"
 
-	"github.com/hectorgimenez/koolo/internal/helper/winproc"
+	"github.com/hectorgimenez/koolo/internal/v2/utils/winproc"
 )
 
 func (gd *MemoryReader) Screenshot() image.Image {
@@ -73,6 +72,7 @@ func (gd *MemoryReader) Screenshot() image.Image {
 }
 
 func (gd *MemoryReader) ScreenshotWithRelease() (image.Image, error) {
+	/*
 	// Create a device context compatible with the window
 	hdcWindow, _, _ := winproc.GetWindowDC.Call(uintptr(gd.HWND))
 	if hdcWindow == 0 {
@@ -157,4 +157,6 @@ func (gd *MemoryReader) ScreenshotWithRelease() (image.Image, error) {
 	}
 
 	return img, nil
+	*/
+	return nil, nil
 }

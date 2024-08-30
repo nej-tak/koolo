@@ -9,15 +9,14 @@ import (
 	"runtime/debug"
 
 	sloggger "github.com/hectorgimenez/koolo/cmd/koolo/log"
-	koolo "github.com/hectorgimenez/koolo/internal"
 	"github.com/hectorgimenez/koolo/internal/config"
 	"github.com/hectorgimenez/koolo/internal/event"
-	"github.com/hectorgimenez/koolo/internal/helper"
-	"github.com/hectorgimenez/koolo/internal/helper/winproc"
-	"github.com/hectorgimenez/koolo/internal/overseer"
 	"github.com/hectorgimenez/koolo/internal/remote/discord"
 	"github.com/hectorgimenez/koolo/internal/remote/telegram"
 	"github.com/hectorgimenez/koolo/internal/server"
+	"github.com/hectorgimenez/koolo/internal/v2/bot"
+	"github.com/hectorgimenez/koolo/internal/v2/utils"
+	"github.com/hectorgimenez/koolo/internal/v2/utils/winproc"
 	"github.com/inkeliz/gowebview"
 	"golang.org/x/sync/errgroup"
 )
@@ -25,7 +24,7 @@ import (
 func main() {
 	err := config.Load()
 	if err != nil {
-		helper.ShowDialog("Error loading configuration", err.Error())
+		utils.ShowDialog("Error loading configuration", err.Error())
 		log.Fatalf("Error loading configuration: %s", err.Error())
 		return
 	}
@@ -41,7 +40,7 @@ func main() {
 			err = fmt.Errorf("fatal error detected, Koolo will close with the following error: %v\n Stacktrace: %s", r, debug.Stack())
 			logger.Error(err.Error())
 			sloggger.FlushLog()
-			helper.ShowDialog("Koolo error :(", fmt.Sprintf("Koolo will close due to an expected error, please check the latest log file for more info!\n %s", err.Error()))
+			utils.ShowDialog("Koolo error :(", fmt.Sprintf("Koolo will close due to an expected error, please check the latest log file for more info!\n %s", err.Error()))
 		}
 	}()
 
@@ -53,8 +52,8 @@ func main() {
 	winproc.SetProcessDpiAware.Call() // Set DPI awareness to be able to read the correct scale and show the window correctly
 
 	eventListener := event.NewListener(logger)
-	manager := koolo.NewSupervisorManager(logger, eventListener)
-
+	//manager := koolo.NewSupervisorManager(logger, eventListener)
+	manager := bot.NewSupervisorManager(logger, eventListener)
 	srv, err := server.New(logger, manager)
 	if err != nil {
 		log.Fatalf("Error starting local server: %s", err.Error())
